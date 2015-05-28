@@ -15,7 +15,7 @@ class QueryBuilder implements QueryBuilderInterface
 {
 
     use ConnectionRetrieveResolverTrait;
-//@TODO INSERT INTO  (`article_id`, `category_id`) VALUES ('3', '1'), ('5', '1');
+//@TODO: INSERT INTO  (`article_id`, `category_id`) VALUES ('3', '1'), ('5', '1');
 
     protected $model;
 
@@ -976,7 +976,7 @@ class QueryBuilder implements QueryBuilderInterface
      * @param  array  $data
      * @return PDOStatement|false|UnexpectedValueException
      */
-    public function execute( array $data = [] )
+    public function execute( array $data = [] ) //@TODO: change name to 'get'
     {
         if( !$statement = $this->statement($data) )
         {
