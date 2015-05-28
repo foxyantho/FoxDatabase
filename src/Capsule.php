@@ -56,7 +56,7 @@ class Capsule
         // We will setup the default configuration. This will make the database
         // manager behave correctly since all the correct binding are in place.
 
-        $this->setupDefaultConfiguration();
+        $this->setupDefaultConfiguration(); // @TODO: simplifier, don't use connector
 
         $this->setupManager();
     }
