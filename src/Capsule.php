@@ -50,20 +50,16 @@ class Capsule
         // manager behave correctly since all the correct binding are in place.
 
         $this->setupDefaultConfiguration(); // @TODO: simplifier, don't use connector
-
-        $this->setupManager();
     }
 
     /**
-     * Run Capsule
-     * 
+     * Setup the default database configuration options.
+     *
      * @return void
      */
-    public function run()
+    protected function setupDefaultConfiguration()
     {
-        $this->setupManager();
-
-        $this->bootConnectionRetrieve();
+        $this->configurations['database.default'] = 'default';
     }
 
     /**
@@ -82,21 +78,21 @@ class Capsule
      * Bootstrap ConnectionRetrieveResolver so it is ready for usage anywhere
      * Used to get the current Connection
      */
-    public function bootConnectionRetrieve()
+    protected function bootConnectionRetrieve()
     {
         ConnectionRetrieveResolver::setConnectionResolver($this->manager);
     }
 
-
-
     /**
-     * Setup the default database configuration options.
-     *
+     * Run Capsule
+     * 
      * @return void
      */
-    protected function setupDefaultConfiguration()
+    public function run()
     {
-        $this->configurations['database.default'] = 'default';
+        $this->setupManager();
+
+        $this->bootConnectionRetrieve();
     }
 
     /**
