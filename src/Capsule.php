@@ -49,16 +49,6 @@ class Capsule
         // We will setup the default configuration. This will make the database
         // manager behave correctly since all the correct binding are in place.
 
-        $this->setupDefaultConfiguration(); // @TODO: simplifier, don't use connector
-    }
-
-    /**
-     * Setup the default database configuration options.
-     *
-     * @return void
-     */
-    protected function setupDefaultConfiguration()
-    {
         $this->configurations['database.default'] = 'default';
     }
 
@@ -105,17 +95,6 @@ class Capsule
     public function addConnection( array $userSettings, $name = 'default' )
     {
         $this->configurations[$name] = array_merge(static::getDefaultSettings(), $userSettings);
-    }
-
-    /**
-     * Get a registered connection instance.
-     *
-     * @param  string  $name
-     * @return \Fox\database\connctions\Connection
-     */
-    public function getConnection( $name = null )
-    {
-        return $this->manager->connection($name);
     }
 
     /**

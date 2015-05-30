@@ -60,11 +60,22 @@ class DatabaseManager implements ConnectionResolverInterface
             $connection = $this->makeConnection($name);
 
             $this->connections[$name] = $connection;
-
-            //$this->connections[$name] = $this->prepare($connection);
         }
 
         return $this->connections[$name];
+    }
+
+    /**
+     * Make the database connection instance.
+     *
+     * @param  string  $name
+     * @return \Fox\Database\Connections\Connection
+     */
+    protected function makeConnection( $name )
+    {
+        $config = $this->getConfig($name);
+
+        return $this->factory->make($config, $name);
     }
 
     /**
@@ -93,19 +104,6 @@ class DatabaseManager implements ConnectionResolverInterface
         $name = $name ?: $this->getDefaultConnection();
 
         unset($this->connections[$name]);
-    }
-
-    /**
-     * Make the database connection instance.
-     *
-     * @param  string  $name
-     * @return \Fox\Database\Connections\Connection
-     */
-    protected function makeConnection( $name )
-    {
-        $config = $this->getConfig($name);
-
-        return $this->factory->make($config, $name);
     }
 
     /**
@@ -138,17 +136,6 @@ class DatabaseManager implements ConnectionResolverInterface
     public function getDefaultConnection()
     {
         return $this->configurations['database.default'];
-    }
-
-    /**
-     * Set the default connection name.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function setDefaultConnection( $name )
-    {
-        $this->configurations['database.default'] = $name;
     }
 
     /**

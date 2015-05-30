@@ -26,25 +26,13 @@ class ConnectionFactory
     }
 
     /**
-     * Establish a PDO connection based on the configuration.
+     * Establish a PDO database connection based on the configuration
      *
      * @param  array   $config
      * @param  string   $name
      * @return Fox\Database\Connections\Connection
      */
     public function make( array $config, $name = null )
-    {
-        //@TODO: $name look at Laravel Database ConnectionFactory
-        return $this->createSingleConnection($config);
-    }
-
-    /**
-     * Create a single database connection instance.
-     *
-     * @param  array  $config
-     * @return \Fox\Database\Connections\Connection
-     */
-    protected function createSingleConnection( array $config )
     {
         $pdo = $this->createConnector($config)->connect($config);
 
