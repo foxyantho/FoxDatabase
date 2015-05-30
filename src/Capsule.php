@@ -10,13 +10,6 @@ class Capsule
 {
 
     /**
-     * The current globally used instance.
-     * 
-     * @var Capsule
-     */
-    protected static $instance;
-
-    /**
      * Configurations container
      */
     protected $configurations = [];
@@ -119,17 +112,6 @@ class Capsule
     }
 
     /**
-     * Get a connection instance from the global manager.
-     *
-     * @param  string  $connection
-     * @return \Fox\database\connctions\Connection
-     */
-    public static function connection( $connection = null )
-    {
-        return static::$instance->getConnection($connection);
-    }
-
-    /**
      * Get a registered connection instance.
      *
      * @param  string  $name
@@ -141,16 +123,6 @@ class Capsule
     }
 
     /**
-     * Make this capsule instance available globally.
-     *
-     * @return void
-     */
-    public function setAsGlobal()
-    {
-        static::$instance = $this;
-    }
-
-    /**
      * Get the database manager instance.
      *
      * @return \Fox\database\DatabaseManager
@@ -158,18 +130,6 @@ class Capsule
     public function getDatabaseManager()
     {
         return $this->manager;
-    }
-
-    /**
-     * Dynamically pass methods to the default connection.
-     *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return mixed
-     */
-    public static function __callStatic( $method, $parameters )
-    {
-        return call_user_func_array([static::connection(), $method], $parameters);
     }
 
 
