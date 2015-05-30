@@ -10,20 +10,6 @@ use InvalidArgumentException;
 class ConnectionFactory
 {
 
-    /**
-     * Configurations container
-     */
-    protected $configurations;
-
-    /**
-     * Create a new connection factory instance.
-     *
-     * @param  $configurations
-     */
-    public function __construct( $configurations )
-    {
-        $this->configurations = $configurations;
-    }
 
     /**
      * Establish a PDO database connection based on the configuration
