@@ -56,12 +56,9 @@ class Connector
     {
         if( isset($config['options']) )
         {
-            //foreach( $config['options'] as $key => $value )
-            //  $this->options[$key] = $value;
+            // merge and keep keys
 
-            // array_diff_key because array_merge re-organize keys
-
-            return array_diff_key($this->options, $config['options']) + $config['options'];
+            return $config['options'] + $this->options;
         }
 
         return $this->getDefaultOptions();
