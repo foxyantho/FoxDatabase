@@ -14,6 +14,7 @@ trait ConnectionRetrieveResolverTrait
      * @var string
      */
     protected $connection;
+
     /**
      * connection resolver instance
      *
