@@ -135,7 +135,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function getDefaultConnection()
     {
-        return $this->configurations['database.default'];
+        return $this->configurations['default'];
     }
 
     /**

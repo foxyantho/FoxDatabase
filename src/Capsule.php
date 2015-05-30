@@ -49,7 +49,7 @@ class Capsule
         // We will setup the default configuration. This will make the database
         // manager behave correctly since all the correct binding are in place.
 
-        $this->configurations['database.default'] = 'default';
+        $this->configurations['default'] = 'default';
     }
 
     /**
