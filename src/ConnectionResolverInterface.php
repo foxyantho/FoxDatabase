@@ -7,6 +7,14 @@ interface ConnectionResolverInterface
 {
 
     /**
+     * Register a connection with the manager.
+     * 
+     * @param array  $settings 
+     * @param string $name
+     */
+    public function addConnection( array $settings, $name = null );
+
+    /**
      * Get a database connection instance.
      *
      * @param  string  $name
@@ -15,10 +23,10 @@ interface ConnectionResolverInterface
     public function connection( $name  );
 
     /**
-     * Get the default connection name.
+     * Return all of the created connections.
      *
-     * @return string
+     * @return array
      */
-    public function getDefaultConnection();
+    public function getConnections();
 
 }
