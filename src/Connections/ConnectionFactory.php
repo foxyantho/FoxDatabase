@@ -29,10 +29,9 @@ class ConnectionFactory
      * Establish a PDO database connection based on the configuration
      *
      * @param  array   $config
-     * @param  string   $name
      * @return Fox\Database\Connections\Connection
      */
-    public function make( array $config, $name = null )
+    public function make( array $config )
     {
         $pdo = $this->createConnector($config)->connect($config);
 

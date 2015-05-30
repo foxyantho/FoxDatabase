@@ -36,7 +36,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * @param  ConnectionFactory  $factory
      * @return void
      */
-    public function __construct( array $configurations, ConnectionFactory $factory )
+    public function __construct( ConnectionFactory $factory, array $configurations )
     {
         $this->configurations = $configurations;
 
@@ -75,7 +75,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $config = $this->getConfig($name);
 
-        return $this->factory->make($config, $name);
+        return $this->factory->make($config);
     }
 
     /**
