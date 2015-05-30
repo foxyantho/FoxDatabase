@@ -79,34 +79,6 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * Reconnect to the given database.
-     *
-     * @param  string  $name
-     * @return \Fox\Database\Connections\Connection
-     */
-    public function reconnect( $name = null )
-    {
-        $name = $name ?: $this->getDefaultConnection();
-
-        $this->disconnect($name);
-
-        return $this->connection($name);
-    }
-
-    /**
-     * Disconnect from the given database.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function disconnect( $name = null )
-    {
-        $name = $name ?: $this->getDefaultConnection();
-
-        unset($this->connections[$name]);
-    }
-
-    /**
      * Get the configuration for a connection.
      *
      * @param  string  $name
