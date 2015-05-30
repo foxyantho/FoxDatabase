@@ -32,13 +32,6 @@ class Connection implements ConnectionInterface
     protected $tablePrefix = '';
 
     /**
-     * The database connection configuration options.
-     *
-     * @var array
-     */
-    protected $config = [];
-
-    /**
      * Indicates whether queries are being logged.
      *
      * @var boolean
@@ -60,10 +53,9 @@ class Connection implements ConnectionInterface
      * @param  \PDO     $pdo
      * @param  string   $database
      * @param  string   $tablePrefix
-     * @param  array    $config
      * @return void
      */
-    public function __construct( PDO $pdo, $database = '', $tablePrefix = '', array $config = [] )
+    public function __construct( PDO $pdo, $database = '', $tablePrefix = '' )
     {
         $this->pdo = $pdo;
 
@@ -72,8 +64,6 @@ class Connection implements ConnectionInterface
         $this->database = $database;
 
         $this->tablePrefix = $tablePrefix;
-
-        $this->config = $config;
     }
 
     /**
