@@ -14,17 +14,20 @@ class Connector
      *
      * @var array
      */
-    protected $options = [
-        PDO::ATTR_CASE => PDO::CASE_NATURAL,
-        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-        PDO::ATTR_STRINGIFY_FETCHES => false,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING, //PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_EMULATE_PREPARES => false
+    public static function getDefaultSettings()
+    {
+        return [
+            PDO::ATTR_CASE => PDO::CASE_NATURAL,
+            PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+            PDO::ATTR_STRINGIFY_FETCHES => false,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING, //PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_EMULATE_PREPARES => false
 
         //PDO::FETCH_OBJ => true,
         //PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-    ];
+        ];
+    }
 
     /**
      * Create a new PDO connection.
@@ -58,31 +61,10 @@ class Connector
         {
             // merge and keep keys
 
-            return $config['options'] + $this->options;
+            return $config['options'] + static::getDefaultSettings();
         }
 
         return $this->getDefaultOptions();
-    }
-
-    /**
-     * Get the default PDO connection options.
-     *
-     * @return array
-     */
-    public function getDefaultOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Set the default PDO connection options.
-     *
-     * @param  array  $options
-     * @return void
-     */
-    public function setDefaultOptions( array $options )
-    {
-        $this->options = $options;
     }
 
 
