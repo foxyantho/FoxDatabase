@@ -1,6 +1,6 @@
 <?php
 
-namespace Fox\Database\Connectors;
+namespace Fox\Database;
 
 use Fox\Database\Interfaces\ConnectorInterface;
 
@@ -26,7 +26,6 @@ class Connector implements ConnectorInterface
             PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING, //PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_EMULATE_PREPARES => false
 
-        //PDO::FETCH_OBJ => true,
         //PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
         ];
     }
@@ -72,17 +71,19 @@ class Connector implements ConnectorInterface
      * @param  string $username
      * @param  string $password
      * @param  array  $options
-     * @return PDO|void
+     * @return \PDO|void
      */
     protected function createConnection( $dsn, $username, $password, array $options )
     {
         try
         {
-            return new PDO($dsn, $username, $password, $options);
+            throw new PDOException("Error Processing Request", 1);
+            
+            //return new PDO($dsn, $username, $password, $options);
         }
         catch( PDOException $e )
         {
-            die('PDOException: ' . get_called_class() . ' -> {' . $e->getCode() . '} ' . $e->getMessage());
+            die('PDOException: ' . $e);
         }
     }
 

@@ -4,6 +4,8 @@ namespace Fox\Database;
 
 use Fox\Database\Interfaces\ConnectionResolverInterface;
 
+use PDO;
+
 use InvalidArgumentException;
 
 
@@ -38,6 +40,8 @@ class DatabaseManager implements ConnectionResolverInterface
             'password'  => '',
             'charset'   => 'utf8',
             'prefix'    => ''
+            // 'port'    => int
+            // 'options' => []
         ];
     }
 
@@ -121,6 +125,8 @@ class DatabaseManager implements ConnectionResolverInterface
     protected function createConnector()
     {
         return new Connector;
+
+        // idea: switch 'driver'
     }
 
     /**
@@ -136,6 +142,8 @@ class DatabaseManager implements ConnectionResolverInterface
     protected function createConnection( PDO $connection, $database, $prefix = '' )
     {
         return new Connection($connection, $database, $prefix);
+
+        // idea: switch 'driver'
     }
 
     /**
@@ -154,7 +162,7 @@ class DatabaseManager implements ConnectionResolverInterface
 
         if( !isset($this->configurations[$name]) )
         {
-            throw new InvalidArgumentException('Database "' . $name . '" not configured.');
+            throw new InvalidArgumentException('Database "' . $name . '" not configured');
         }
 
         return $this->configurations[$name];

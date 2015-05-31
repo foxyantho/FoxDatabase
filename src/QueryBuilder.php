@@ -19,9 +19,6 @@ class QueryBuilder implements QueryBuilderInterface
     use ConnectionRetrieveResolverTrait;
 //@TODO: INSERT INTO  (`article_id`, `category_id`) VALUES ('3', '1'), ('5', '1');
 
-    protected $model;
-
-
     const SELECT = 1;
     const UPDATE = 2;
     const DELETE = 3;
@@ -56,32 +53,9 @@ class QueryBuilder implements QueryBuilderInterface
     {
         // default query type
 
-        $this->setQueryType(static::SELECT);
+        //$this->setQueryType(static::SELECT);
 
         // @TODO: implements OR / IN / NOT IN ...
-    }
-
-    /**
-     * Get the Model
-     * 
-     * @return ModelInterface
-     */
-    public function getModel()
-    {
-        return $this->model;
-    }
-
-    /**
-     * Set the Model
-     * 
-     * @param ModelInterface $model
-     * @return  this
-     */
-    public function setModel( ModelInterface $model )
-    {
-        $this->model = $model;
-
-        return $this;
     }
 
     /**
@@ -99,7 +73,7 @@ class QueryBuilder implements QueryBuilderInterface
      * 
      * @param int $type
      */
-    public function setQueryType( $type )
+    public function queryType( $type )
     {
         $this->type = $type;
     }
@@ -114,11 +88,6 @@ class QueryBuilder implements QueryBuilderInterface
         if( !empty($this->tables) )
         {
             return $this->tables;
-        }
-
-        if( isset($this->model) )
-        {
-            return [$this->model->getTable()];
         }
 
         throw new LogicException('No tables were found.');
@@ -174,19 +143,12 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
-     * Get fields / model fields
+     * Get fields
      * 
      * @return array
      */
     public function getFields()
     {
-        /*if( isset($this->model) )
-        {
-            return $this->model->getAttributesKeys();
-
-            // only keys ; elsewere: "key = value" in plain text
-        }*/
-
         return $this->fields;
     }
 
@@ -251,7 +213,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function select( $keys = null )
     {
-        //$this->setQueryType(static::SELECT);
+        $this->setQueryType(static::SELECT);
 
         if( isset($keys) )
         {
@@ -387,8 +349,21 @@ class QueryBuilder implements QueryBuilderInterface
 
         if( isset($tables) )
         {
-            $this->table($tables);
+            $this->into($tables);
         }
+
+        return $this;
+    }
+
+    /**
+     * INTO clause
+     * 
+     * @param  string|array $tables
+     * @return $this
+     */
+    public function into( $tables )
+    {
+        $this->table($tables);
 
         return $this;
     }
@@ -454,40 +429,7 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function whereRaw( $where )
     {
-        // @TODO
-    }
-
-    /**
-     * WHERE clause with Model's PK
-     * 
-     * @param  boolean $with_value key value in plain text
-     * @return LogicException|this
-     */
-    public function wherePK( $with_value = false )
-    {
-        if( !isset($this->model) )
-        {
-            throw new LogicException('No model is set ; cannot get primary key.');
-        }
-
-        $key = $this->model->getKeyName();
-
-        if( $with_value )
-        {
-            $value = $this->model->getKey();
-
-            $this->where([$key => $value]);
-
-            // pk = xx
-        }
-        else
-        {
-            $this->where($key);
-
-            // pk = :pk
-        }
-
-        return $this;
+        // @TODO:x
     }
 
     public function removeWhere( $key )
@@ -580,8 +522,6 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function offset( $key )
     {
-        // throw new LogicException('Can not set "offset" without "limit".');
-
         $this->offset = $key;
 
         return $this;
@@ -959,6 +899,8 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
     /**
      * Execute a statement
@@ -968,7 +910,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     protected function statement( array $data = [] )
     {
-        return $this->getConnection()->statement($this->getQueryString(), $data);
+        return $this->connection()->statement($this->getQueryString(), $data);
     }
 
 
@@ -976,7 +918,7 @@ class QueryBuilder implements QueryBuilderInterface
      * Execute the query, and get its result
      * 
      * @param  array  $data
-     * @return PDOStatement|false|UnexpectedValueException
+     * @return PDOStatement|bool|int|UnexpectedValueException
      */
     public function execute( array $data = [] ) //@TODO: change name to 'get'
     {
@@ -996,9 +938,12 @@ class QueryBuilder implements QueryBuilderInterface
                 return true; // already tested, look upper if()
 
             case static::DELETE:
-            case static::INSERT:
 
                 return $statement->rowCount();
+
+            case static::INSERT:
+
+                return $this->connection()->lastInsertId();
 
             default:
 
@@ -1020,7 +965,9 @@ class QueryBuilder implements QueryBuilderInterface
         {
             if( is_array($results) )
             {
-                return array_shift($results); // first element
+                // if multiple results, get only the first
+
+                return array_shift($results);
             }
 
             return $results;
@@ -1028,43 +975,6 @@ class QueryBuilder implements QueryBuilderInterface
 
         return false;
     }
-
-
-
-
-
-
-
-    /*public function prepare()
-    {
-        $this->prepared =
-
-
-        return $this;
-    }*/
-
-
-    /**
-     * Execute the query, fill the model and return it
-     * 
-     * @param  array  $data
-     * @return LogicException|Model|false
-     */
-    /*public function executeAndFillModel( array $data = [] )
-    {
-        if( !isset($this->model) )
-        {
-            throw new LogicException('No model is set ; cannot execute.');
-        }
-
-        if( $results = $this->single($data) )
-        {
-            $this->model->fillFromResults($results);
-        }
-
-        return false;
-    }*/
-
 
 
 }

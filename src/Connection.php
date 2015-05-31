@@ -1,6 +1,6 @@
 <?php
 
-namespace Fox\Database\Connections;
+namespace Fox\Database;
 
 use Fox\Database\Interfaces\ConnectionInterface;
 
@@ -15,7 +15,7 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var PDO
+     * @var \PDO
      */
     protected $pdo;
 
@@ -55,7 +55,6 @@ class Connection implements ConnectionInterface
      * @param  \PDO     $pdo
      * @param  string   $database
      * @param  string   $tablePrefix
-     * @return void
      */
     public function __construct( PDO $pdo, $database = '', $tablePrefix = '' )
     {
@@ -84,7 +83,7 @@ class Connection implements ConnectionInterface
      *
      * @param  string    $query
      * @param  array     $bindings
-     * @return PDOStatement|false
+     * @return \PDOStatement|false
      */
     protected function runQuery( $query, array $bindings = [] )
     {
@@ -160,7 +159,7 @@ class Connection implements ConnectionInterface
      * 
      * @param  string $query
      * @param  array  $bindings
-     * @return object
+     * @return array|\stdClass|false
      */
     public function row( $query, array $bindings = [] )
     {
@@ -174,7 +173,7 @@ class Connection implements ConnectionInterface
      * 
      * @param  string $query
      * @param  array  $bindings
-     * @return array
+     * @return array|\stdClass|false
      */
     public function all( $query, array $bindings = [] )
     {
@@ -231,8 +230,6 @@ class Connection implements ConnectionInterface
 
     /**
      * Start a new database transaction.
-     *
-     * @return void
      */
     public function beginTransaction()
     {
@@ -241,8 +238,6 @@ class Connection implements ConnectionInterface
 
     /**
      * Commit the active database transaction.
-     *
-     * @return void
      */
     public function commit()
     {
@@ -251,8 +246,6 @@ class Connection implements ConnectionInterface
 
     /**
      * Rollback the active database transaction.
-     *
-     * @return void
      */
     public function rollBack()
     {
@@ -280,7 +273,6 @@ class Connection implements ConnectionInterface
      * @param  string  $query
      * @param  array   $bindings
      * @param  $time
-     * @return void
      */
     protected function logQuery( $query, $bindings, $time = null )
     {
@@ -301,8 +293,6 @@ class Connection implements ConnectionInterface
 
     /**
      * Clear the query log.
-     *
-     * @return void
      */
     public function flushQueryLog()
     {
@@ -311,8 +301,6 @@ class Connection implements ConnectionInterface
 
     /**
      * Enable the query log on the connection.
-     *
-     * @return void
      */
     public function enableQueryLog()
     {
@@ -321,8 +309,6 @@ class Connection implements ConnectionInterface
 
     /**
      * Disable the query log on the connection.
-     *
-     * @return void
      */
     public function disableQueryLog()
     {
@@ -353,10 +339,10 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection.
      *
-     * @param  \PDO|null  $pdo
+     * @param  \PDO  $pdo
      * @return $this
      */
-    public function pdo( $pdo )
+    public function pdo( PDO $pdo )
     {
         $this->pdo = $pdo;
 
@@ -377,7 +363,6 @@ class Connection implements ConnectionInterface
      * Set the name of the connected database.
      *
      * @param  string  $database
-     * @return void
      */
     public function databaseName( $database )
     {
@@ -398,7 +383,6 @@ class Connection implements ConnectionInterface
      * Set the table prefix in use by the connection.
      *
      * @param  string  $prefix
-     * @return void
      */
     public function tablePrefix( $prefix )
     {
