@@ -41,6 +41,7 @@ class DatabaseManager implements ConnectionResolverInterface
             'charset'   => 'utf8',
             'prefix'    => ''
             // 'port'    => int
+            // 'strict'  => bool
             // 'options' => []
         ];
     }
@@ -79,6 +80,25 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
+     * Open a connection and simply store its instance
+     * 
+     * @param  string $name
+     */
+    public function makeAndStoreConnection( $name = null )
+    {
+        $name = $name ?: static::getDefaultConnectionName();
+
+        // if we haven't created this connection, we'll create it based on the config
+
+        if( !isset($this->connections[$name]) )
+        {
+            $connection = $this->makeConnection($name);
+
+            $this->connections[$name] = $connection;
+        }
+    }
+
+    /**
      * Get a database connection instance.
      *
      * @param  string  $name
@@ -88,14 +108,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $name = $name ?: static::getDefaultConnectionName();
 
-        // If we haven't created this connection, we'll create it based on the config
-
-        if( !isset($this->connections[$name]) )
-        {
-            $connection = $this->makeConnection($name);
-
-            $this->connections[$name] = $connection;
-        }
+        $this->makeAndStoreConnection($name);
 
         return $this->connections[$name];
     }
