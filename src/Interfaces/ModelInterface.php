@@ -3,30 +3,43 @@
 namespace Fox\Database\Interfaces;
 
 
+
 interface ModelInterface
 {
 
+    public function __construct( $attributes );
+
+    // table
+
     public function getTable();
 
-    public function setTable( $table );
+    public function table( $table );
+
+    // query
 
     public function query();
 
-    
+    public static function newQueryBuilder();
+
+    // syncing
+
     public function sync();
 
     public function revert();
 
-    public function fill( $attributes );
-
-    public function save();
+    // model
 
     public function delete();
 
     public static function create( array $attributes );
 
+    public function save();
+
+    // attributes
 
     public function getAttributes();
+
+    public function attributes( $attributes, $sync );
 
     public function getAttributesKeys();
 
@@ -36,37 +49,32 @@ interface ModelInterface
 
     public function __get( $key );
 
-    public function setAttribute( $key, $value );
+    public function attribute( $key, $value );
 
     public function __set( $key, $value );
 
+    public function __isset( $key );
+
+    public function __unset( $key );
+
+    // PK
 
     public function getKey();
 
     public function getKeyName();
 
+    public function keypair();
 
-    public static function find( array $wheres, array $columns );
+    public function key( $value );
 
-    public static function findBy( $key, $value, array $columns );
+    // find by PK
 
-    public static function findById( $id, array $columns );
-
-    public static function findAll( array $columns, array $wheres, $limit, $offset );
-
-    public static function findAllForPage( array $columns, array $wheres, $page, $perPage );
+    public static function find( $value );
 
 
-    public static function newQueryBuilder( $model );
+    public function toJson( $options );
 
-
-    public static function newFromResults( $attributes );
-
-    public function fillFromResults( $attributes );
-
-    public static function hydrate( array $items, $connection );
-
-    public static function hydrateRaw( $query, array $bindings, $connection );
+    public function __toString();
 
 
 }
