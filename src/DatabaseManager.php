@@ -2,7 +2,7 @@
 
 namespace Fox\Database;
 
-use Fox\Database\Connections\ConnectionFactory;
+
 use Fox\Database\ConnectionRetrieveResolverTrait as ConnectionRetrieveResolver;
 
 use InvalidArgumentException;
@@ -10,13 +10,6 @@ use InvalidArgumentException;
 
 class DatabaseManager implements ConnectionResolverInterface
 {
-
-    /**
-     * The database connection factory instance.
-     *
-     * @var \Fox\Database\Connections\ConnectionFactory
-     */
-    protected $factory;
 
     /**
      * Configurations container
@@ -61,17 +54,9 @@ class DatabaseManager implements ConnectionResolverInterface
 
     /**
      * Create a new database manager instance.
-     *
-     * @param  $configurations
-     * @param  ConnectionFactory  $factory
-     * @return void
      */
     public function __construct()
     {
-        // build the connection factory
-
-        $this->factory = new ConnectionFactory;
-
         // bootstrap ConnectionRetrieveResolver so it is ready for usage anywhere
 
         ConnectionRetrieveResolver::setConnectionResolver($this);
@@ -122,7 +107,36 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $config = $this->getConfig($name);
 
-        return $this->factory->make($config);
+
+        $pdo = $this->createConnector()->connect($config);
+
+        return $this->createConnection($pdo, $config['database'], $config['prefix']);
+    }
+
+    /**
+     * Create a connector instance based on the configuration.
+     *
+     * @throws \InvalidArgumentException
+     * @return \Fox\Database\Connector
+     */
+    protected function createConnector()
+    {
+        return new Connector;
+    }
+
+    /**
+     * Create a new connection instance.
+     *
+     * @param  string   $driver
+     * @param  \PDO     $connection
+     * @param  string   $database
+     * @param  string   $prefix
+     * @throws \InvalidArgumentException
+     * @return \Fox\Database\Connection
+     */
+    protected function createConnection( PDO $connection, $database, $prefix = '' )
+    {
+        return new Connection($connection, $database, $prefix);
     }
 
     /**
@@ -164,7 +178,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * @param  array   $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call( $method, $parameters )
     {
         return call_user_func_array([$this->connection(), $method], $parameters);
     }
