@@ -75,15 +75,13 @@ class Connector implements ConnectorInterface
      */
     protected function createConnection( $dsn, $username, $password, array $options )
     {
-        try
+        //try
         {
-            throw new PDOException("Error Processing Request", 1);
-            
-            //return new PDO($dsn, $username, $password, $options);
+            return new PDO($dsn, '$username', $password, $options);
         }
-        catch( PDOException $e )
+        //catch( PDOException $e )
         {
-            die('PDOException: ' . $e);
+            //die('Connector: Could not connect to database, code : ' . $e->getCode());
         }
     }
 
@@ -96,14 +94,11 @@ class Connector implements ConnectorInterface
      */
     protected function getDsn( array $config )
     {
-        $dsn = [];
+        extract($config);
 
-        foreach( $config['dsn'] as $key => $value )
-        {
-            $dsn[] = $key . '=' .$value;
-        }
-
-        return $config['driver'] . ':' . implode(';', $dsn);
+        return isset($config['port'])
+                ? $driver . ':host=' . $host . ';port=' . $port . ';dbname=' . $database
+                : $driver . ':host=' . $host . ';dbname=' . $database;
     }
 
     /**
@@ -121,7 +116,7 @@ class Connector implements ConnectorInterface
             return $config['options'] + static::getDefaultSettings();
         }
 
-        return $this->getDefaultOptions();
+        return static::getDefaultSettings();
     }
 
 
