@@ -97,7 +97,7 @@ class Connection implements ConnectionInterface
 
     //var_dump($query);die;
 
-        $statement = $this->getPdo()->prepare($query);
+        $statement = $this->pdo->prepare($query);
 
         $statement->execute($bindings);
 
@@ -190,7 +190,7 @@ class Connection implements ConnectionInterface
      */
     public function lastInsertId()
     {
-        return $this->getPdo()->lastInsertId();
+        return $this->pdo->lastInsertId();
     }
 
     /**
@@ -236,7 +236,7 @@ class Connection implements ConnectionInterface
      */
     public function beginTransaction()
     {
-        $this->getPdo()->beginTransaction();
+        $this->pdo->beginTransaction();
     }
 
     /**
@@ -246,7 +246,7 @@ class Connection implements ConnectionInterface
      */
     public function commit()
     {
-        $this->getPdo()->commit();
+        $this->pdo->commit();
     }
 
     /**
@@ -256,7 +256,7 @@ class Connection implements ConnectionInterface
      */
     public function rollBack()
     {
-        $this->getPdo()->rollBack();
+        $this->pdo->rollBack();
     }
 
 
