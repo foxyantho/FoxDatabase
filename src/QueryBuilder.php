@@ -2,6 +2,8 @@
 
 namespace Fox\Database;
 
+use Fox\Database\Interfaces\QueryBuilderInterface;
+
 use Closure;
 use LogicException;
 use UnexpectedValueException;
@@ -622,7 +624,7 @@ class QueryBuilder implements QueryBuilderInterface
             {
                 if( !is_string($key) ) // non associative array : ['key', 'key']
                 {
-                    $key = $value;
+                    $key = $value; //@FIXME: unknow when using number etc
 
                     $value = null; // must be null -> futher isset() ; if($value) with empty string
                 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Fox\Database;
+namespace Fox\Database\Interfaces;
 
 
 interface ConnectionResolverInterface
@@ -12,13 +12,13 @@ interface ConnectionResolverInterface
      * @param array  $settings 
      * @param string $name
      */
-    public function addConnection( array $settings, $name = null );
+    public function addConnection( array $settings, $name );
 
     /**
      * Get a database connection instance.
      *
      * @param  string  $name
-     * @return \Illuminate\Database\Connection
+     * @return \Fox\Database\Connection
      */
     public function connection( $name  );
 

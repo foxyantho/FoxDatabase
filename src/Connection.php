@@ -2,6 +2,8 @@
 
 namespace Fox\Database\Connections;
 
+use Fox\Database\Interfaces\ConnectionInterface;
+
 use PDO;
 use Closure;
 use Exception;

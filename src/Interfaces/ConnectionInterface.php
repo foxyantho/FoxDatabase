@@ -1,6 +1,6 @@
 <?php
 
-namespace Fox\database\connections;
+namespace Fox\Database\Interfaces;
 
 use Closure;
 

@@ -2,8 +2,7 @@
 
 namespace Fox\Database;
 
-
-use Fox\Database\ConnectionRetrieveResolverTrait as ConnectionRetrieveResolver;
+use Fox\Database\Interfaces\ConnectionResolverInterface;
 
 use InvalidArgumentException;
 
@@ -59,7 +58,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         // bootstrap ConnectionRetrieveResolver so it is ready for usage anywhere
 
-        ConnectionRetrieveResolver::setConnectionResolver($this);
+        ConnectionRetrieveResolverTrait::setConnectionResolver($this);
     }
 
     /**
@@ -79,7 +78,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * Get a database connection instance.
      *
      * @param  string  $name
-     * @return \Fox\Database\Connections\Connection
+     * @return \Fox\Database\Connection
      */
     public function connection( $name = null )
     {

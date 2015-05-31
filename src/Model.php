@@ -2,6 +2,8 @@
 
 namespace Fox\Database;
 
+use Fox\Database\Interfaces\ModelInterface;
+
 use BadMethodCallException;
 
 

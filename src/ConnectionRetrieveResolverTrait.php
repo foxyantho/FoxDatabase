@@ -2,7 +2,7 @@
 
 namespace Fox\Database;
 
-use Fox\Database\ConnectionResolverInterface as ConnectionResolver;
+use Fox\Database\Interfaces\ConnectionResolverInterface as ConnectionResolver;
 
 
 trait ConnectionRetrieveResolverTrait
@@ -10,15 +10,13 @@ trait ConnectionRetrieveResolverTrait
 
     /**
      * connection name for the model
-     *
      * @var string
      */
     protected $connection;
 
     /**
      * connection resolver instance
-     *
-     * @var \Fox\Database\ConnectionResolverInterface
+     * @var ConnectionResolver
      */
     protected static $resolver;
 
@@ -55,7 +53,7 @@ trait ConnectionRetrieveResolverTrait
     /**
      * Get the database connection for the model.
      *
-     * @return \Fox\Database\Connections\Connection
+     * @return Connection
      */
     final public function getConnection()
     {
@@ -89,7 +87,7 @@ trait ConnectionRetrieveResolverTrait
      * Resolve a connection instance.
      *
      * @param  string  $connection
-     * @return \Fox\Database\connections\Connection
+     * @return Connection
      */
     final public static function resolveConnection( $connection = null )
     {
@@ -99,7 +97,7 @@ trait ConnectionRetrieveResolverTrait
     /**
      * Get the connection resolver instance.
      *
-     * @return \Fox\Database\ConnectionResolverInterface
+     * @return \Fox\Database\Interfaces\ConnectionResolverInterface
      */
     final public static function getConnectionResolver()
     {
@@ -109,7 +107,7 @@ trait ConnectionRetrieveResolverTrait
     /**
      * Set the connection resolver instance.
      *
-     * @param  \Fox\Database\ConnectionResolverInterface  $resolver
+     * @param  ConnectionResolverInterface  $resolver
      */
     final public static function setConnectionResolver( ConnectionResolver $resolver )
     {

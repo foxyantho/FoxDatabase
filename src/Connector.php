@@ -2,11 +2,13 @@
 
 namespace Fox\Database\Connectors;
 
+use Fox\Database\Interfaces\ConnectorInterface;
+
 use PDO;
 use PDOException;
 
 
-class Connector
+class Connector implements ConnectorInterface
 {
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace Fox\Database;
+namespace Fox\Database\Interfaces;
 
 
 interface ModelInterface
