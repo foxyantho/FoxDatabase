@@ -356,7 +356,7 @@ class Connection implements ConnectionInterface
      * @param  \PDO|null  $pdo
      * @return $this
      */
-    public function setPdo( $pdo )
+    public function pdo( $pdo )
     {
         $this->pdo = $pdo;
 
@@ -379,7 +379,7 @@ class Connection implements ConnectionInterface
      * @param  string  $database
      * @return void
      */
-    public function setDatabaseName( $database )
+    public function databaseName( $database )
     {
         $this->database = $database;
     }
@@ -400,7 +400,7 @@ class Connection implements ConnectionInterface
      * @param  string  $prefix
      * @return void
      */
-    public function setTablePrefix( $prefix )
+    public function tablePrefix( $prefix )
     {
         $this->tablePrefix = $prefix;
     }
