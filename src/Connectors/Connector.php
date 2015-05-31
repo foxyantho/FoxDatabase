@@ -30,18 +30,53 @@ class Connector
     }
 
     /**
-     * Create a new PDO connection.
+     * Establish a database connection.
      *
-     * @param  string  $dsn
-     * @param  array   $config
-     * @param  array   $options
-     * @return PDO
+     * @param  array  $config
+     * @return \PDO
      */
-    public function createConnection( $dsn, array $config, array $options )
+    public function connect( array $config )
+    {
+        $dsn = $this->getDsn($config);
+
+        $options = $this->getOptions($config);
+
+        // brand new connection with PDO options
+
+        $connection = $this->createConnection($dsn, $config['username'], $config['password'], $options);
+
+        // Next we will set the "names"
+
+        if( isset($config['charset']) )
+        {
+            $connection->prepare('SET NAMES ' . $config['charset'])->execute();
+        }
+
+        // If the "strict" option has been configured for the connection we'll
+        // enable it : enforces some extra rules when using a MySQL database system.
+
+        if( isset($config['strict']) && $config['strict'] )
+        {
+            $connection->prepare("SET SESSION sql_mode='STRICT_ALL_TABLES'")->execute();
+        }
+
+        return $connection;
+    }
+
+    /**
+     * Create a new PDO connection.
+     * 
+     * @param  string $dsn
+     * @param  string $username
+     * @param  string $password
+     * @param  array  $options
+     * @return PDO|void
+     */
+    protected function createConnection( $dsn, $username, $password, array $options )
     {
         try
         {
-            return new PDO($dsn, $config['username'], $config['password'], $options);
+            return new PDO($dsn, $username, $password, $options);
         }
         catch( PDOException $e )
         {
@@ -50,16 +85,35 @@ class Connector
     }
 
     /**
+     * Create a DSN string from a configuration.
+     * Everything in the 'dsn' config will included.
+     *
+     * @param  array   $config
+     * @return string
+     */
+    protected function getDsn( array $config )
+    {
+        $dsn = [];
+
+        foreach( $config['dsn'] as $key => $value )
+        {
+            $dsn[] = $key . '=' .$value;
+        }
+
+        return $config['driver'] . ':' . implode(';', $dsn);
+    }
+
+    /**
      * Get the PDO options based on the configuration.
      *
      * @param  array  $config
      * @return array
      */
-    public function getOptions( array $config )
+    protected function getOptions( array $config )
     {
         if( isset($config['options']) )
         {
-            // merge and keep keys
+            // merge with keys keeping
 
             return $config['options'] + static::getDefaultSettings();
         }
