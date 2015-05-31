@@ -42,17 +42,22 @@ class MySqlConnector extends Connector implements ConnectorInterface
 
     /**
      * Create a DSN string from a configuration.
+     * Everything in the 'dsn' config will included.
      *
      * @param  array   $config
      * @return string
      */
     protected function getDsn( array $config )
     {
-        extract($config);
+        $dsn = [];
 
-        return isset($config['port'])
-                        ? 'mysql:host=' . $host . ';port=' . $port . ';dbname=' . $database
-                        : 'mysql:host=' . $host . ';dbname=' . $database;
+        foreach( $config['dsn'] as $key => $value )
+        {
+            $dsn[] = $key . '=' .$value;
+        }
+
+
+        return $config['driver'] . ':' . implode(';', $dsn);
     }
 
 
