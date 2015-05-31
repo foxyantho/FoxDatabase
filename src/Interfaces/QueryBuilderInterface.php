@@ -5,20 +5,13 @@ namespace Fox\Database\Interfaces;
 
 interface QueryBuilderInterface
 {
-
-    static function newInstance(); // ConnectionRetrieveResolver
-
-
-    public function getModel();
-
-    public function setModel( ModelInterface $model );
-
+    // query
 
     public function getQueryType();
 
-    public function setQueryType( $type );
+    public function queryType( $type );
 
-    // TABLES //
+    // tables
 
     public function getTables();
 
@@ -26,7 +19,7 @@ interface QueryBuilderInterface
 
     public function removeTable( $tables );
 
-    // FIELDS //
+    // fields
 
     public function getFields();
 
@@ -34,7 +27,7 @@ interface QueryBuilderInterface
 
     public function removeField( $fields );
 
-    // SELECT //
+    // select
 
     public function select( $keys );
 
@@ -48,61 +41,59 @@ interface QueryBuilderInterface
 
     public function removeSelect( $keys );
 
-    // UPDATE //
+    // update
 
     public function update( $tables );
 
     public function set( $keys );
 
-    // DELETE //
+    // delete
 
     public function delete( $tables );
 
-    // INSERT //
+    // insert
 
     public function insert( $tables );
 
+    public function into( $tables );
+
     public function values( $values );
 
-    // FROM //
+    // from
 
     public function from( $keys );
 
     public function removeFrom( $keys );
 
-    // WHERE //
+    // where
 
     public function where( $keys );
 
-    public function wherePK( $with_value );
-
     public function removeWhere( $key );
 
-    // GROUP BY //
+    // group by
 
     public function groupBy( $keys );
 
-    // HAVING //
+    // having
 
     public function having( $keys );
 
-    // ORDER BY //
+    // order by
 
     public function orderBy( $keys, $suffix );
 
-    // LIMIT //
+    // limit
 
     public function limit( $key );
 
-    // OFFSET //
-
     public function offset( $key );
 
-    //
+    // querystring
 
     public function getQueryString();
 
-    //
+    // pdo results
 
     public function execute( array $data );
 
