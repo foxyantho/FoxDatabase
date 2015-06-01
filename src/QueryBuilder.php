@@ -707,8 +707,6 @@ class QueryBuilder implements QueryBuilderInterface
 
             // xx = yy / xx = :xx
         }
-
-        return null;
     }
 
     /**
@@ -722,8 +720,6 @@ class QueryBuilder implements QueryBuilderInterface
         {
             return 'GROUP BY ' . $this->arrayAsString($this->groupBy);
         }
-
-        return null;
     }
 
     /**
@@ -737,8 +733,6 @@ class QueryBuilder implements QueryBuilderInterface
         {
             return 'HAVING ' . $this->arrayAsString($this->having, ' AND ');
         }
-
-        return null;
     }
 
     /**
@@ -752,8 +746,6 @@ class QueryBuilder implements QueryBuilderInterface
         {
             return 'ORDER BY ' . $this->arrayAsString($this->orderBy) . ' ' . ( $this->orderBySuffix ?: null );
         }
-
-        return null;
     }
 
 
@@ -775,8 +767,6 @@ class QueryBuilder implements QueryBuilderInterface
         }
 
         //return 'LIMIT ' . ( isset($this->offset) ? $this->offset . ', ' . $this->limit : $this->limit );
-
-        return null;
     }
 
 
