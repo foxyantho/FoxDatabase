@@ -53,7 +53,7 @@ class QueryBuilder implements QueryBuilderInterface
     {
         // default query type
 
-        //$this->setQueryType(static::SELECT);
+        //$this->queryType(static::SELECT);
 
         // @TODO: implements OR / IN / NOT IN ...
     }
@@ -213,7 +213,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function select( $keys = null )
     {
-        $this->setQueryType(static::SELECT);
+        $this->queryType(static::SELECT);
 
         if( isset($keys) )
         {
@@ -290,7 +290,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function update( $tables = null )
     {
-        $this->setQueryType(static::UPDATE);
+        $this->queryType(static::UPDATE);
 
         if( isset($tables) )
         {
@@ -324,7 +324,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function delete( $tables = null )
     {
-        $this->setQueryType(static::DELETE);
+        $this->queryType(static::DELETE);
 
         if( isset($tables) )
         {
@@ -345,7 +345,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function insert( $tables = null )
     {
-        $this->setQueryType(static::INSERT);
+        $this->queryType(static::INSERT);
 
         if( isset($tables) )
         {
