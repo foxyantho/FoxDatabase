@@ -187,11 +187,21 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
 
         if( $this->exist )
         {
-            $saved = $this->query()
-                          ->update()
-                          ->set($this->diffKeys())
-                          ->where($this->keypair())
-                          ->execute($this->diff());
+            if( !empty($this->diff) )
+            {
+                $saved = $this->query()
+                              ->update()
+                              ->set($this->diffKeys())
+                              ->where($this->keypair())
+                              ->execute($this->diff());
+            }
+            else
+            {
+                // all modified attributes are the same as those in Database,
+                // so don't need to unnecessarily update it
+
+                $saved = true; // same return as QueryBuilder::UPDATE
+            }
         }
 
         // If the model is brand new, we'll insert it into our database and set the
@@ -519,6 +529,7 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
     {
         return $this->toJson();
     }
+
 
     /**
      * Handle dynamic static QueryBuilder calls into the method.
