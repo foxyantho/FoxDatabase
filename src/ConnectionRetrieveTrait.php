@@ -5,7 +5,7 @@ namespace Fox\Database;
 use Fox\Database\Interfaces\ConnectionResolverInterface as ConnectionResolver;
 
 
-trait ConnectionRetrieveResolverTrait
+trait ConnectionRetrieveTrait
 {
 
     /**
