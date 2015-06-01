@@ -402,13 +402,14 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
     }
 
     /**
-     * Return an array with key name and value
+     * Return an associative array with key name and value
+     * Exclusively used with WHERE clause in queries
      * 
      * @return array
      */
     public function keypair()
     {
-        return [ $this->getKeyName(), $this->getKey() ];
+        return [ $this->getKeyName() => $this->getKey() ];
     }
 
     /**
@@ -439,7 +440,6 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
         $keyname = $model->getKeyName();
 
         $results = $model->query()
-                         ->select($columns)
                          ->where($keyname)
                          ->single([$keyname => $value]);
 
@@ -527,7 +527,7 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
      * @param  array   $arguments
      * @return mixed|BadMethodCallException
      */
-    public static function __callStatic( $method, $parameters )
+    /*public static function __callStatic( $method, $parameters )
     {
         $builder = static::newQueryBuilder();
 
@@ -537,7 +537,7 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
         }
 
         throw new BadMethodCallException('Call to undefined method "' . get_class($builder) . '"::' . $method . '()');
-    }
+    }*/
 
 
 }
