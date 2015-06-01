@@ -16,7 +16,7 @@ use UnexpectedValueException;
 class QueryBuilder implements QueryBuilderInterface
 {
 
-    use ConnectionRetrieveResolverTrait;
+    use ConnectionRetrieveTrait;
 //@TODO: INSERT INTO  (`article_id`, `category_id`) VALUES ('3', '1'), ('5', '1');
 
     const SELECT = 1;

@@ -63,7 +63,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         // bootstrap ConnectionRetrieveResolver so it is ready for usage anywhere
 
-        ConnectionRetrieveResolverTrait::setConnectionResolver($this);
+        ConnectionRetrieveTrait::setConnectionResolver($this);
     }
 
     /**
