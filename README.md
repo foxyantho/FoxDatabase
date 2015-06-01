@@ -33,8 +33,8 @@ $m = new DatabaseManager;
 $m->addConnection($config); // 'default'
 
 $m->addConnection($config2, 'myconnection');
-
 ```
+
 
 ## Models
 
@@ -84,8 +84,31 @@ $update = $article2->save();
 $article3 = Article::on('connection2')->find( $id = 1 );
 
 $affected = $article3->delete();
-
 ```
+
+
+# Query log :
+
+First, set config['querylog'] config to `true`.
+
+```PHP
+$m = new DatabaseManager;
+
+$m->addConnection($config, 'myconnection');
+
+$logs = $m->connection('myconnection')->getQueryLog();
+
+
+foreach( $logs as $query )
+{
+    echo 'Query: ' . $query['query'];
+
+    echo 'Bindings: ' . json_encode($query['bindings']);
+
+    echo 'Process time: ' . $query['time'];
+}
+```
+
 
 ## QueryBuilder
 
@@ -97,21 +120,39 @@ Basic CRUD :
 use Fox\Database\QueryBuilder;
 
 $single = (new QueryBuilder() )
-                ->select(['title', 'content'])
+                ->select([
+                    'title',
+                    'content'
+                ])
                 ->max('comments')
-                ->from('@article')
-                ->where('id')
+                ->selectFunction('COUNT', 'comments')
+                ->from([
+                    '@article',
+                    '@comments'
+                ])
+                ->where([
+                    'id',
+                    'authord'
+                ])
                 ->groupBy('id')
                 ->having('date > 2014')
                 ->orderBy('date')
                 ->limit(10)
                 ->offset(5)
-                ->execute(['id' => 1]);
+                ->execute([
+                    'id' => 1,
+                    'author' => 'John Doe'
+                ]);
 
 $result = (new QueryBuilder() )
                 ->update('@article')
-                ->set(['title' => '"New Title"', 'content'])
-                ->execute(['content' => '...']);
+                ->set([
+                    'title' => '"New Title"',
+                    'content'
+                ])
+                ->execute([
+                    'content' => '...']
+                );
 
 $affected = (new QueryBuilder() )
                 ->delete()
@@ -121,7 +162,12 @@ $affected = (new QueryBuilder() )
 $lastid = (new QueryBuilder() )
                 ->insert()
                 ->into('@article')
-                ->values(['title' => '"Title"', 'content'])
-                ->execute(['content' => '...']);
+                ->values([
+                    'title' => '"Title"',
+                    'content'
+                ])
+                ->execute([
+                    'content' => '...'
+                ]);
 ```
 
