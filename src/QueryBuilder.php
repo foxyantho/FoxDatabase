@@ -976,5 +976,15 @@ class QueryBuilder implements QueryBuilderInterface
         return false;
     }
 
+    /**
+     * To String method
+     * 
+     * @return string|UnexpectedValueException
+     */
+    public function __toString()
+    {
+        return $this->getQueryString();
+    }
+
 
 }
