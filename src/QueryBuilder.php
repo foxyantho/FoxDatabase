@@ -53,7 +53,7 @@ class QueryBuilder implements QueryBuilderInterface
     {
         // default query type
 
-        //$this->queryType(static::SELECT);
+        $this->queryType(static::SELECT);
 
         // @TODO: implements OR / IN / NOT IN ...
     }
