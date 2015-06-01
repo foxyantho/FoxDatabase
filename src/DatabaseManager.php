@@ -39,10 +39,12 @@ class DatabaseManager implements ConnectionResolverInterface
             'username'  => '',
             'password'  => '',
             'charset'   => 'utf8',
-            'prefix'    => ''
-            // 'port'    => int
-            // 'strict'  => bool
-            // 'options' => []
+            'prefix'    => '',
+
+            // 'port'     => int
+            // 'strict'   => bool
+            // 'options'  => []
+            'querylog' => true
         ];
     }
 
@@ -126,7 +128,7 @@ class DatabaseManager implements ConnectionResolverInterface
 
         $pdo = $this->createConnector()->connect($config);
 
-        return $this->createConnection($pdo, $config['database'], $config['prefix']);
+        return $this->createConnection($pdo, $config['database'], $config['prefix'], $config['querylog']);
     }
 
     /**
@@ -139,7 +141,7 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         return new Connector;
 
-        // idea: switch 'driver'
+        // idea: factory switch 'driver'
     }
 
     /**
@@ -152,11 +154,11 @@ class DatabaseManager implements ConnectionResolverInterface
      * @throws \InvalidArgumentException
      * @return \Fox\Database\Connection
      */
-    protected function createConnection( PDO $connection, $database, $prefix = '' )
+    protected function createConnection( PDO $connection, $database, $prefix = '', $querylog = false )
     {
-        return new Connection($connection, $database, $prefix);
+        return new Connection($connection, $database, $prefix, $querylog);
 
-        // idea: switch 'driver'
+        // idea: factory switch 'driver'
     }
 
     /**

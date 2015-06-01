@@ -13,36 +13,31 @@ class Connection implements ConnectionInterface
 {
 
     /**
-     * The active PDO connection.
-     *
+     * active PDO connection
      * @var \PDO
      */
     protected $pdo;
 
     /**
-     * The name of the connected database.
-     *
+     * name of the connected database
      * @var string
      */
     protected $database;
 
     /**
-     * The table prefix for the connection.
-     *
+     * table prefix for the connection
      * @var string
      */
     protected $tablePrefix = '';
 
     /**
-     * Indicates whether queries are being logged.
-     *
+     * indicates whether queries are being logged
      * @var boolean
      */
     protected $loggingQueries = false;
 
     /**
-     * All of the queries run against the connection.
-     *
+     * all the queries run against the connection
      * @var array
      */
     protected $queryLog = [];
@@ -56,7 +51,7 @@ class Connection implements ConnectionInterface
      * @param  string   $database
      * @param  string   $tablePrefix
      */
-    public function __construct( PDO $pdo, $database = '', $tablePrefix = '' )
+    public function __construct( PDO $pdo, $database = '', $tablePrefix = '', $querylog = false )
     {
         $this->pdo = $pdo;
 
@@ -65,6 +60,8 @@ class Connection implements ConnectionInterface
         $this->database = $database;
 
         $this->tablePrefix = $tablePrefix;
+
+        $this->loggingQueries = $querylog;
     }
 
     /**

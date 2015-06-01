@@ -46,20 +46,21 @@ class Connector implements ConnectorInterface
 
         $connection = $this->createConnection($dsn, $config['username'], $config['password'], $options);
 
-        // Next we will set the "names"
+        // next we will set the "names"
 
         if( isset($config['charset']) )
         {
             $connection->prepare('SET NAMES ' . $config['charset'])->execute();
         }
 
-        // If the "strict" option has been configured for the connection we'll
-        // enable it : enforces some extra rules when using a MySQL database system.
+        // if "strict" option has been configured for the connection
+        // enforces some extra rules when using a MySQL database system
 
         if( isset($config['strict']) && $config['strict'] )
         {
             $connection->prepare("SET SESSION sql_mode='STRICT_ALL_TABLES'")->execute();
         }
+
 
         return $connection;
     }
