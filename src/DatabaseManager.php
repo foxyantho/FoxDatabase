@@ -2,7 +2,10 @@
 
 namespace Fox\Database;
 
-use Fox\Database\Connections\ConnectionFactory;
+use Fox\Database\Interfaces\ConnectionResolverInterface;
+
+use PDO;
+
 use InvalidArgumentException;
 
 
@@ -10,16 +13,9 @@ class DatabaseManager implements ConnectionResolverInterface
 {
 
     /**
-     * The database connection factory instance.
-     *
-     * @var \Fox\Database\Connections\ConnectionFactory
-     */
-    protected $factory;
-
-    /**
      * Configurations container
      */
-    protected $configurations;
+    protected $configurations = [];
 
     /**
      * The active connection instances.
@@ -30,69 +26,93 @@ class DatabaseManager implements ConnectionResolverInterface
 
 
     /**
-     * Create a new database manager instance.
-     *
-     * @param  $configurations
-     * @param  ConnectionFactory  $factory
-     * @return void
+     * Get default application settings
+     * 
+     * @return array
      */
-    public function __construct( array $configurations, ConnectionFactory $factory )
+    protected static function getDefaultSettings()
     {
-        $this->configurations = $configurations;
+        return [
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'database',
+            'username'  => '',
+            'password'  => '',
+            'charset'   => 'utf8',
+            'prefix'    => '',
 
-        $this->factory = $factory;
+            // 'port'     => int
+            // 'strict'   => bool
+            // 'options'  => []
+            'querylog' => true
+        ];
     }
 
     /**
-     * Get a database connection instance.
+     * Get the default connection name.
      *
-     * @param  string  $name
-     * @return \Fox\Database\Connections\Connection
+     * @return string
      */
-    public function connection( $name = null )
+    protected static function getDefaultConnectionName()
     {
-        $name = $name ?: $this->getDefaultConnection();
+        return 'default';
+    }
 
-        // If we haven't created this connection, we'll create it based on the config
+    /**
+     * Create a new database manager instance.
+     */
+    public function __construct()
+    {
+        // bootstrap ConnectionRetrieveResolver so it is ready for usage anywhere
+
+        ConnectionRetrieveTrait::setConnectionResolver($this);
+    }
+
+    /**
+     * Register a connection with the manager.
+     * 
+     * @param array  $settings 
+     * @param string $name
+     */
+    public function addConnection( array $settings, $name = null )
+    {
+        $name = $name ?: static::getDefaultConnectionName();
+
+        $this->configurations[$name] = array_merge(static::getDefaultSettings(), $settings);
+    }
+
+    /**
+     * Open a connection and simply store its instance
+     * 
+     * @param  string $name
+     */
+    public function makeAndStoreConnection( $name = null )
+    {
+        $name = $name ?: static::getDefaultConnectionName();
+
+        // if we haven't created this connection, we'll create it based on the config
 
         if( !isset($this->connections[$name]) )
         {
             $connection = $this->makeConnection($name);
 
             $this->connections[$name] = $connection;
-
-            //$this->connections[$name] = $this->prepare($connection);
         }
+    }
+
+    /**
+     * Get a database connection instance.
+     *
+     * @param  string  $name
+     * @return \Fox\Database\Connection
+     */
+    public function connection( $name = null )
+    {
+        $name = $name ?: static::getDefaultConnectionName();
+
+        $this->makeAndStoreConnection($name);
 
         return $this->connections[$name];
-    }
-
-    /**
-     * Reconnect to the given database.
-     *
-     * @param  string  $name
-     * @return \Fox\Database\Connections\Connection
-     */
-    public function reconnect( $name = null )
-    {
-        $name = $name ?: $this->getDefaultConnection();
-
-        $this->disconnect($name);
-
-        return $this->connection($name);
-    }
-
-    /**
-     * Disconnect from the given database.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function disconnect( $name = null )
-    {
-        $name = $name ?: $this->getDefaultConnection();
-
-        unset($this->connections[$name]);
     }
 
     /**
@@ -105,7 +125,40 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $config = $this->getConfig($name);
 
-        return $this->factory->make($config, $name);
+
+        $pdo = $this->createConnector()->connect($config);
+
+        return $this->createConnection($pdo, $config['database'], $config['prefix'], $config['querylog']);
+    }
+
+    /**
+     * Create a connector instance based on the configuration.
+     *
+     * @throws \InvalidArgumentException
+     * @return \Fox\Database\Connector
+     */
+    protected function createConnector()
+    {
+        return new Connector;
+
+        // idea: factory switch 'driver'
+    }
+
+    /**
+     * Create a new connection instance.
+     *
+     * @param  string   $driver
+     * @param  \PDO     $connection
+     * @param  string   $database
+     * @param  string   $prefix
+     * @throws \InvalidArgumentException
+     * @return \Fox\Database\Connection
+     */
+    protected function createConnection( PDO $connection, $database, $prefix = '', $querylog = false )
+    {
+        return new Connection($connection, $database, $prefix, $querylog);
+
+        // idea: factory switch 'driver'
     }
 
     /**
@@ -117,38 +170,17 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function getConfig( $name )
     {
-        $name = $name ?: $this->getDefaultConnection();
+        $name = $name ?: static::getDefaultConnectionName();
 
         // To get the database connection configuration based of the given name.
         // If the configuration doesn't exist, we'll throw an exception.
 
         if( !isset($this->configurations[$name]) )
         {
-            throw new InvalidArgumentException('Database "' . $name . '" not configured.');
+            throw new InvalidArgumentException('Database "' . $name . '" not configured');
         }
 
         return $this->configurations[$name];
-    }
-
-    /**
-     * Get the default connection name.
-     *
-     * @return string
-     */
-    public function getDefaultConnection()
-    {
-        return $this->configurations['database.default'];
-    }
-
-    /**
-     * Set the default connection name.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function setDefaultConnection( $name )
-    {
-        $this->configurations['database.default'] = $name;
     }
 
     /**
@@ -168,7 +200,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * @param  array   $parameters
      * @return mixed
      */
-    public function __call($method, $parameters)
+    public function __call( $method, $parameters )
     {
         return call_user_func_array([$this->connection(), $method], $parameters);
     }

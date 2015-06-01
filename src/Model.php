@@ -2,50 +2,46 @@
 
 namespace Fox\Database;
 
+use Fox\Database\Interfaces\ModelInterface;
+use Fox\Database\Interfaces\ConnectionRetrieveInterface;
+
+use Closure;
+
 use BadMethodCallException;
 
 
-/**
- * Model Class
- * MVC part
- */
-abstract class Model implements ModelInterface
+abstract class Model implements ModelInterface, ConnectionRetrieveInterface
 {
 
-    use ConnectionRetrieveResolverTrait;
+    use ConnectionRetrieveTrait;
 
 
     /**
-     * The table associated with the model.
-     *
+     * the table associated with the model.
      * @var string
      */
     protected $table;
 
     /**
      * primary key for the model
-     *
      * @var string
      */
     protected $primaryKey = 'id';
 
     /**
-     * model attribute's original state
-     *
+     * model attribute's ( current state )
      * @var array
      */
     protected $original = [];
 
     /**
-     * model's attributes
-     *
+     * model's attributes ( draft state )
      * @var array
      */
     protected $attributes = [];
 
     /**
-     * indicates if the model exists
-     *
+     * indicates if the current model exists
      * @var boolean
      */
     public $exist = false;
@@ -58,9 +54,7 @@ abstract class Model implements ModelInterface
      */
     public function __construct( $attributes = [] )
     {
-        $this->sync();
-
-        $this->fill($attributes);
+        $this->attributes($attributes);
     }
 
 
@@ -79,37 +73,47 @@ abstract class Model implements ModelInterface
             return $this->table;
         }
 
-        // @NOTE: @ -> look at database/connections/connection
+        // '@' will be replace by table preffix by Connection
 
-        return '@' . strtolower(substr(strrchr(get_called_class(), '\\'), 1));
-
-        // or: end(explode('\\', static::class)
+        return '@' . strtolower(end(explode('\\', get_called_class())));
     }
 
     /**
      * Set the table associated with the model.
      *
      * @param  string  $table
-     * @return void
      */
-    public function setTable( $table )
+    public function table( $table )
     {
         $this->table = $table;
     }
 
     /**
-     * Start a new query builder instance for the model
+     * Start a new query builder with model's given table
      * 
      * @return QueryBuilder
      */
     public function query()
     {
-        return static::newQueryBuilder($this);
+        $builder = static::newQueryBuilder();
+
+        $builder->table($this->getTable());
+
+        return $builder;
     }
 
+    /**
+     * Create a new query builder instance
+     * 
+     * @param  static $model
+     * @return QueryBuilder
+     */
+    public static function newQueryBuilder()
+    {
+        return new QueryBuilder;
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     /**
      * Sync the original attributes with the current.
@@ -136,39 +140,25 @@ abstract class Model implements ModelInterface
     }
 
     /**
-     * Fill the model with an array of attributes.
+     * Delete an object, and check if it was affected by DELETE
      *
-     * @param mixed|array $attributes
-     * @return $this
-     */
-    public function fill( $attributes = [] )
-    {
-        foreach( $attributes as $key => $value )
-        {
-            $this->setAttribute($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Delete an object
-     *
-     * @return mixed
+     * @return int|false
      */
     public function delete()
     {
-        $data[$this->getKeyName()] = $this->getKey(); // include pk
+        $result = $this->query()
+                       ->delete()
+                       ->where($this->keypair())
+                       ->execute();
 
-        $query = $this->query()
-                        ->delete()
-                        ->wherePK();
+        if( $result > 0 )
+        {
+            $this->exist = false;
 
-        $result = $query->execute($data);
+            return $result;
+        }
 
-        $this->finishDelete();
-
-        return $result;
+        return false;
     }
 
     /**
@@ -186,26 +176,32 @@ abstract class Model implements ModelInterface
         return $instance;
     }
 
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
     /**
-     * Save current object
+     * Save current object, and return the PDO query result
      *
-     * @return mixed
+     * @return true|false|int
      */
     public function save()
     {
-        // If the model already exists in the database we can just update our record
-        // that is already in this database using the current IDs in this "where"
-        // clause to only update this model. Otherwise, we'll just insert them.
+        // if the model already exists in the database, update the record using "where PK"
 
         if( $this->exist )
         {
-            $saved = $this->update();
+            if( !empty($this->diff) )
+            {
+                $saved = $this->query()
+                              ->update()
+                              ->set($this->diffKeys())
+                              ->where($this->keypair())
+                              ->execute($this->diff());
+            }
+            else
+            {
+                // all modified attributes are the same as those in Database,
+                // so don't need to unnecessarily update it
 
-            $this->finishUpdate();
+                $saved = true; // same return as QueryBuilder::UPDATE
+            }
         }
 
         // If the model is brand new, we'll insert it into our database and set the
@@ -214,90 +210,24 @@ abstract class Model implements ModelInterface
 
         else
         {
-            $saved = $this->insert();
+            $saved = $this->query()
+                          ->insert()
+                          ->values($this->getAttributesKeys())
+                          ->execute($this->getAttributes());
 
-            $this->finishInsert();
+            // finish insert
+
+            $this->key($saved);
         }
 
+        // finish save
 
-        $this->finishSave();
-
-        return $saved;
-    }
-
-    /**
-     * Insert the model in the database
-     * 
-     * @return mixed
-     */
-    protected function insert()
-    {
-        $fields = $this->getAttributesKeys();
-
-        $data = $this->getAttributes();
-
-        $query = $this->query()
-                        ->insert()
-                        ->values($fields);
-
-        return $query->execute($data);
-    }
-
-    /**
-     * Update modified attributes on the model
-     * 
-     * @return mixed
-     */
-    protected function update()
-    {
-        $fields = $this->diffKeys();
-
-        $data = $this->diff();
-
-        $data[$this->getKeyName()] = $this->getKey(); // include pk
-
-        $query = $this->query()
-                        ->update()
-                        ->set($fields)
-                        ->wherePK();
-
-        return $query->execute($data);
-    }
-
-    /**
-     * Finish processing on a successful Save operation.
-     */
-    protected function finishSave()
-    {
         $this->exist = true;
 
         $this->sync();
-    }
 
-    /**
-     * Finish processing on a successful Insert operation
-     */
-    protected function finishInsert()
-    {
-        $id = $this->getConnection()->lastInsertId();
 
-        $this->setKey($id);
-    }
-
-    /**
-     * Finish processing on a successful Update operation
-     */
-    protected function finishUpdate()
-    {
-
-    }
-
-    /**
-     * Finish processing on a successful Delete operation
-     */
-    protected function finishDelete()
-    {
-        $this->exist = false;
+        return $saved;
     }
 
 
@@ -311,7 +241,7 @@ abstract class Model implements ModelInterface
      */
     protected function diff()
     {
-        return array_diff($this->attributes, $this->original); // inverted diff
+        return array_diff($this->attributes, $this->original);
     }
 
     /**
@@ -342,6 +272,28 @@ abstract class Model implements ModelInterface
     public function getAttributes()
     {
         return $this->attributes;
+    }
+
+    /**
+     * Fill the model with an array of attributes. No checking is done.
+     *
+     * @param mixed|array $attributes
+     * @param  bool   $sync
+     * @return $this
+     */
+    public function attributes( $attributes = [], $sync = false )
+    {
+        foreach( $attributes as $key => $value )
+        {
+            $this->attribute($key, $value);
+        }
+
+        if( $sync )
+        {
+            $this->sync();
+        }
+
+        return $this;
     }
 
     /**
@@ -397,7 +349,7 @@ abstract class Model implements ModelInterface
      * @param  string  $key
      * @param  mixed   $value
      */
-    public function setAttribute( $key, $value )
+    public function attribute( $key, $value )
     {
         $this->attributes[$key] = $value;
     }
@@ -410,26 +362,7 @@ abstract class Model implements ModelInterface
      */
     public function __set( $key, $value )
     {
-        $this->setAttribute($key, $value);
-    }
-
-    /**
-     * Set the array of model attributes. No checking is done.
-     *
-     * @param  mixed|array  $attributes
-     * @param  bool   $sync
-     * @return void
-     */
-    protected function setRawAttributes( $attributes, $sync = false )
-    {
-        //$this->attributes = $attributes; //<-- cannot if stdClass
-
-        $this->fill($attributes);
-
-        if( $sync )
-        {
-            $this->sync();
-        }
+        $this->attribute($key, $value);
     }
 
     /**
@@ -453,6 +386,7 @@ abstract class Model implements ModelInterface
     {
         unset($this->attributes[$key]);
     }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -478,15 +412,26 @@ abstract class Model implements ModelInterface
     }
 
     /**
+     * Return an associative array with key name and value
+     * Exclusively used with WHERE clause in queries
+     * 
+     * @return array
+     */
+    public function keypair()
+    {
+        return [ $this->getKeyName() => $this->getKey() ];
+    }
+
+    /**
      * Set the primary key for the model
      * 
      * @param mixed $value
      */
-    protected function setKey( $value )
+    public function key( $value )
     {
-        $pk = $this->getKeyName();
+        $key = $this->getKeyName();
 
-        $this->setAttribute($pk, $value);
+        $this->attribute($key, $value);
     }
 
 
@@ -494,161 +439,29 @@ abstract class Model implements ModelInterface
 
 
     /**
-     * Find a single model based on wheres array
+     * Retrieving a record by its primary key
      * 
-     * @param  array $columns
-     * @param  array $wheres
      * @return static|bool
      */
-    public static function find( array $wheres, array $columns = ['*'] )
+    public static function find( $value )
     {
         $model = static::newInstance();
 
-        $whereskeys = array_keys($wheres); // can't implode multidimentional ; don't want values in plain text
+        $keyname = $model->getKeyName();
 
-
-        $query = $model->query()
-                        ->select($columns)
-                        ->where($whereskeys)
-                        ->limit(1);
-
-        if( $results = $query->single($wheres) )
-        {
-            $model->fillFromResults($results);
-
-            return $model;
-        }
-
-        return false;
-    }
-
-    /**
-     * Find a single model by it's attribute equal $value
-     * 
-     * @param  string $key
-     * @param  mixed $value
-     * @return static|bool
-     */
-    public static function findBy( $key, $value, array $columns = ['*'] )
-    {
-        $wheres[$key] = $value;
-
-        return static::find($wheres, $columns);
-    }
-
-    /**
-     * Find a single model by its primary key.
-     *
-     * @param  mixed  $id
-     * @param  array  $columns
-     * @return static|false
-     */
-    public static function findById( $id, array $columns = ['*'] )
-    {
-        // can't use static::find() because, we need getKeyName() before
-
-        $model = static::newInstance();
-
-        $query = $model->query()
-                        ->select($columns)
-                        ->wherePK()
-                        ->limit(1);
-
-        $data[$model->getKeyName()] = $id; // include pk
-
-
-        if( $results = $query->single($data) )
-        {
-            $model->fillFromResults($results);
-
-            return $model;
-        }
-
-        return false;
-    }
-
-    /**
-     * Find all models
-     * Last arg is always limit
-     * 
-     * @param  array $columns
-     * @return rray|false
-     */
-    public static function findAll( array $columns = ['*'], array $wheres = [], $limit = null, $offset = null )
-    {
-        $whereskeys = array_keys($wheres); // can't implode multidimentional
-
-        $query = static::select($columns)->where($whereskeys);
-
-
-        if( isset($offset) )
-        {
-            list($offset, $limit) = [$limit, $offset];
-
-            // if 2 args -> $limit become $offset ( invertion ) -> last arg is always limit
-        }
-
-        $query->limit($limit)->offset($offset);
-
-        $results = $query->execute($wheres);
-
+        $results = $model->query()
+                         ->where($keyname)
+                         ->single([$keyname => $value]);
 
         if( $results )
         {
-            $models = [];
+            $model->fillFromResults($results);
 
-            foreach( $results as $result )
-            {
-                $models[] = static::newFromResults($result);
-            }
-
-            return $models;
+            return $model;
         }
 
         return false;
     }
-
-    /**
-     * Set the limit and offset for a given page.
-     *
-     * @param  int  $page
-     * @param  int  $perPage
-     * @return 
-     */
-    public static function findAllForPage( array $columns = ['*'], array $wheres = [], $page = 1, $perPage = 10 )
-    {
-        $offset = ( $page - 1 ) * $perPage;
-
-        return static::findAll($columns, $wheres, $offset, $perPage);
-
-        // @TODO: order by
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    /**
-     * Create a new query builder instance for the model ( static )
-     * 
-     * @param  static $model
-     * @return QueryBuilder
-     */
-    public static function newQueryBuilder( $model = null )
-    {
-        $builder = new QueryBuilder;
-
-        if( isset($model) )
-        {
-            $builder->setModel($model);
-        }
-
-        return $builder;
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     /**
      * Create a new model instance that is existing
@@ -668,69 +481,12 @@ abstract class Model implements ModelInterface
      */
     public function fillFromResults( $attributes = [] )
     {
-        $this->setRawAttributes($attributes, true);
+        $this->attributes($attributes, true); // +sync
 
         $this->exist = true;
+
+        return $this;
     }
-
-    /**
-     * Create a collection of models from plain arrays.
-     *
-     * @param  array  $items
-     * @param  string  $connection
-     * @return array
-     */
-    public static function hydrate( array $items, $connection = null )
-    {
-        $instance = new static;
-
-        $collection = [];
-
-        foreach( $items as $item )
-        {
-            $model = $instance->fillFromResults($item);
-
-            if( isset($connection) )
-            {
-                $model->setConnection($connection);
-            }
-
-            $collection[] = $model;
-        }
-
-        return $collection;
-    }
-
-    /**
-     * Create a collection of models from a raw query.
-     *
-     * @param  string  $query
-     * @param  array  $bindings
-     * @param  string  $connection
-     * @return array
-     */
-    public static function hydrateRaw( $query, array $bindings = [], $connection = null )
-    {
-        $instance = new static;
-
-        if ( isset($connection) )
-        {
-            $instance->setConnection($connection);
-        }
-
-        $results = $instance->getConnection()->all($query, $bindings);
-
-        if( $results )
-        {
-            return static::hydrate($results, $connection);
-        }
-
-        return false;
-    }
-
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
     /**
      * Create a new instance of the given model
@@ -774,6 +530,7 @@ abstract class Model implements ModelInterface
         return $this->toJson();
     }
 
+
     /**
      * Handle dynamic static QueryBuilder calls into the method.
      *
@@ -781,9 +538,9 @@ abstract class Model implements ModelInterface
      * @param  array   $arguments
      * @return mixed|BadMethodCallException
      */
-    public static function __callStatic( $method, $parameters )
+    /*public static function __callStatic( $method, $parameters )
     {
-        $builder = static::newQueryBuilder(new static);
+        $builder = static::newQueryBuilder();
 
         if( method_exists($builder, $method) )
         {
@@ -791,7 +548,7 @@ abstract class Model implements ModelInterface
         }
 
         throw new BadMethodCallException('Call to undefined method "' . get_class($builder) . '"::' . $method . '()');
-    }
+    }*/
 
 
 }

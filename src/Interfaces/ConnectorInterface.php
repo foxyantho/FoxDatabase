@@ -1,6 +1,6 @@
 <?php
 
-namespace Fox\Database\Connectors;
+namespace Fox\Database\Interfaces;
 
 
 interface ConnectorInterface
