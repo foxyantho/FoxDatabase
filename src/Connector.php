@@ -75,13 +75,13 @@ class Connector implements ConnectorInterface
      */
     protected function createConnection( $dsn, $username, $password, array $options )
     {
-        //try
+        try
         {
-            return new PDO($dsn, '$username', $password, $options);
+            return new PDO($dsn, $username, $password, $options);
         }
-        //catch( PDOException $e )
+        catch( PDOException $e )
         {
-            //die('Connector: Could not connect to database, code : ' . $e->getCode());
+            die('Connector: Could not connect to database, code : ' . $e->getCode());
         }
     }
 
