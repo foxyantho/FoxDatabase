@@ -1,6 +1,7 @@
 # FoxDatabase
 
-Simple stack including : database connections & management, model and a query-string builder.
+Eavily inspired of Illiminate\Database. Simple stack including :
+database connections & management, model and a query-string builder.
 
 Still in beta, use at your own risk! MySQL and derivates only,
 it could works under different DBMS, but no guarantees.
@@ -87,9 +88,9 @@ $affected = $article3->delete();
 ```
 
 
-# Query log :
+## Query log :
 
-First, set config['querylog'] config to `true`.
+First, set `$config['querylog']` config to `true`.
 
 ```PHP
 $m = new DatabaseManager;
@@ -109,6 +110,45 @@ foreach( $logs as $query )
 }
 ```
 
+## Connection
+
+Simili-facade on Connection :
+
+```PHP
+$m = new DatabaseManager;
+
+$m->addConnection($config, 'myconnection');
+
+$conn = $m->connection('myconnection');
+
+
+$pdostatment = $conn->statement('SELECT 1');
+
+
+$id = $conn->single('SELECT id FROM table WHERE id = :id', $bindings);
+
+echo $id;
+
+
+$row = $conn->row('SELECT * FROM table WHERE id = :id', $bindings);
+
+echo $row->id;
+
+
+$all = $conn->all('SELECT * FROM table');
+
+foreach( $all as $prop ) {
+
+    echo $prop->id;
+}
+
+
+$results = $conn->transaction(function($c) {
+
+    $c->execute('UPDATE table SET id = :id', $bindings);
+
+});
+```
 
 ## QueryBuilder
 
