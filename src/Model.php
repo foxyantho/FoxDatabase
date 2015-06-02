@@ -105,7 +105,6 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
     /**
      * Create a new query builder instance
      * 
-     * @param  static $model
      * @return QueryBuilder
      */
     public static function newQueryBuilder()
@@ -187,7 +186,7 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
 
         if( $this->exist )
         {
-            if( !empty($this->diff) )
+            if( !empty($this->diff()) )
             {
                 $saved = $this->query()
                               ->update()

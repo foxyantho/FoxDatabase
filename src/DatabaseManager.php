@@ -147,10 +147,10 @@ class DatabaseManager implements ConnectionResolverInterface
     /**
      * Create a new connection instance.
      *
-     * @param  string   $driver
      * @param  \PDO     $connection
      * @param  string   $database
      * @param  string   $prefix
+     * @param  boolean  $querylog
      * @throws \InvalidArgumentException
      * @return \Fox\Database\Connection
      */
