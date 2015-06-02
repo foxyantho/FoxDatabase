@@ -121,23 +121,16 @@ class QueryBuilder implements QueryBuilderInterface
     {
         if( is_string($tables) )
         {
+            $tables = [$tables];
+        }
+
+        foreach( $tables as $key )
+        {
             if( isset($this->tables[$key]) )
             {
                 unset($this->tables[$key]);
             }
         }
-        elseif( is_array($tables) )
-        {
-            foreach( $tables as $key )
-            {
-                if( isset($this->tables[$key]) )
-                {
-                    unset($this->tables[$key]);
-                }
-            }
-
-        }
-
 
         return $this;
     }
@@ -181,21 +174,15 @@ class QueryBuilder implements QueryBuilderInterface
     {
         if( is_string($fields) )
         {
+            $fields = [$fields];
+        }
+
+        foreach( $fields as $key )
+        {
             if( isset($this->fields[$key]) )
             {
                 unset($this->fields[$key]);
             }
-        }
-        elseif( is_array($fields) )
-        {
-            foreach( $fields as $key )
-            {
-                if( isset($this->fields[$key]) )
-                {
-                    unset($this->fields[$key]);
-                }
-            }
-
         }
 
         return $this;
@@ -285,7 +272,7 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * UPDATE clause
      * 
-     * @param  string|null $table
+     * @param  string|null $tables
      * @return this
      */
     public function update( $tables = null )
@@ -303,7 +290,7 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * UPDATE SET clause
      * 
-     * @param  string|array $values
+     * @param  string|array $keys
      * @return this
      */
     public function set( $keys )
@@ -319,7 +306,7 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * DELETE clause
      * 
-     * @param  string|null $table
+     * @param  string|null $tables
      * @return this
      */
     public function delete( $tables = null )
@@ -340,7 +327,7 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * INSERT INTO clause
      * 
-     * @param  string|null $table
+     * @param  string|null $tables
      * @return this
      */
     public function insert( $tables = null )
