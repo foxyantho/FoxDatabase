@@ -80,7 +80,7 @@ class Connection implements ConnectionInterface
      *
      * @param  string    $query
      * @param  array     $bindings
-     * @return \PDOStatement|false
+     * @return boolean
      */
     protected function runQuery( $query, array $bindings = [] )
     {
