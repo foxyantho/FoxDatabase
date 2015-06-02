@@ -490,9 +490,9 @@ class QueryBuilder implements QueryBuilderInterface
      * 
      * @param  int $limit
      */
-    public function limit( $key )
+    public function limit( $limit )
     {
-        $this->limit = $key;
+        $this->limit = $limit;
 
         return $this;
     }
@@ -500,11 +500,11 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * Set OFFSET clause
      * 
-     * @param  int $key
+     * @param  int $offset
      */
-    public function offset( $key )
+    public function offset( $offset )
     {
-        $this->offset = $key;
+        $this->offset = $offset;
 
         return $this;
     }
