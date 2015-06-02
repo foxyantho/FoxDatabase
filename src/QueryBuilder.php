@@ -414,11 +414,6 @@ class QueryBuilder implements QueryBuilderInterface
         return $this;
     }
 
-    public function whereRaw( $where )
-    {
-        // @TODO:x
-    }
-
     public function removeWhere( $key )
     {
         unset($this->where[$key]);
