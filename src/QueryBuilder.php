@@ -844,7 +844,8 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * Get the final generated query string
      * 
-     * @return string|UnexpectedValueException
+     * @throws \UnexpectedValueException
+     * @return string
      */
     public function getQueryString()
     {
@@ -890,7 +891,8 @@ class QueryBuilder implements QueryBuilderInterface
      * Execute the query, and get its result
      * 
      * @param  array  $data
-     * @return PDOStatement|bool|int|UnexpectedValueException
+     * @throws \UnexpectedValueException
+     * @return array|bool|int|string
      */
     public function execute( array $data = [] ) //@TODO: change name to 'get'
     {
@@ -903,7 +905,7 @@ class QueryBuilder implements QueryBuilderInterface
         {
             case static::SELECT:
 
-                return $statement->fetchAll();
+                return $statement->fetchAll(); // array
 
             case static::UPDATE:
 
@@ -915,14 +917,12 @@ class QueryBuilder implements QueryBuilderInterface
 
             case static::INSERT:
 
-                return $this->connection()->lastInsertId();
+                return $this->connection()->lastInsertId(); // string
 
             default:
 
                 throw new UnexpectedValueException('This query type can not return results.');
         }
-
-        return false;
     }
 
     /**
