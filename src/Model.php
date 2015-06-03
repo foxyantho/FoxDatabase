@@ -5,10 +5,6 @@ namespace Fox\Database;
 use Fox\Database\Interfaces\ModelInterface;
 use Fox\Database\Interfaces\ConnectionRetrieveInterface;
 
-use Closure;
-
-use BadMethodCallException;
-
 
 abstract class Model implements ModelInterface, ConnectionRetrieveInterface
 {
