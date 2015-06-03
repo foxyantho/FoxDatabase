@@ -19,12 +19,14 @@ class QueryBuilder implements QueryBuilderInterface
     use ConnectionRetrieveTrait;
 //@TODO: INSERT INTO  (`article_id`, `category_id`) VALUES ('3', '1'), ('5', '1');
 
+
     const SELECT = 1;
     const UPDATE = 2;
     const DELETE = 3;
     const INSERT = 4;
 
-    protected $type;
+
+    protected $type = static::SELECT;
 
     protected $fields = []; //attributes : SELECT xx, SET xx, VALUES xx
 
@@ -48,15 +50,6 @@ class QueryBuilder implements QueryBuilderInterface
     protected $offset;
 
 
-
-    public function __construct()
-    {
-        // default query type
-
-        $this->queryType(static::SELECT);
-
-        // @TODO: implements OR / IN / NOT IN ...
-    }
 
     /**
      * Get query string type
@@ -894,7 +887,7 @@ class QueryBuilder implements QueryBuilderInterface
      * @throws \UnexpectedValueException
      * @return array|bool|int|string
      */
-    public function execute( array $data = [] ) //@TODO: change name to 'get'
+    public function execute( array $data = [] )
     {
         if( !$statement = $this->statement($data) )
         {
@@ -929,7 +922,7 @@ class QueryBuilder implements QueryBuilderInterface
      * Execute the query and get the first set of results
      * 
      * @param  array  $data
-     * @return Object|mixed|false
+     * @return stdClass|array|false
      */
     public function single( array $data = [] )
     {
