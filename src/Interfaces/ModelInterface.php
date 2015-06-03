@@ -11,15 +11,15 @@ interface ModelInterface
 
     // table
 
-    public function getTable();
+    public static function getTable();
 
-    public function table( $table );
+    public static function table( $table );
 
     // query
 
-    public function query();
+    public static function query();
 
-    public static function newQueryBuilder();
+    public static function newQuery();
 
     // syncing
 

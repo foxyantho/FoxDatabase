@@ -23,7 +23,7 @@ interface QueryBuilderInterface
 
     public function getFields();
 
-    public function field( $fields );
+    public function fields( $fields );
 
     public function removeField( $fields );
 
@@ -98,6 +98,8 @@ interface QueryBuilderInterface
     public function execute( array $data );
 
     public function single( array $data );
+
+    public function findBy( $key, $value );
 
 
 }

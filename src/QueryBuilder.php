@@ -19,12 +19,14 @@ class QueryBuilder implements QueryBuilderInterface
     use ConnectionRetrieveTrait;
 //@TODO: INSERT INTO  (`article_id`, `category_id`) VALUES ('3', '1'), ('5', '1');
 
+
     const SELECT = 1;
     const UPDATE = 2;
     const DELETE = 3;
     const INSERT = 4;
 
-    protected $type;
+
+    protected $type = self::SELECT;
 
     protected $fields = []; //attributes : SELECT xx, SET xx, VALUES xx
 
@@ -48,15 +50,6 @@ class QueryBuilder implements QueryBuilderInterface
     protected $offset;
 
 
-
-    public function __construct()
-    {
-        // default query type
-
-        $this->queryType(static::SELECT);
-
-        // @TODO: implements OR / IN / NOT IN ...
-    }
 
     /**
      * Get query string type
@@ -152,7 +145,7 @@ class QueryBuilder implements QueryBuilderInterface
      * @param  string|array $fields
      * @return this
      */
-    public function field( $fields )
+    public function fields( $fields )
     {
         if( is_string($fields) )
         {
@@ -204,7 +197,7 @@ class QueryBuilder implements QueryBuilderInterface
 
         if( isset($keys) )
         {
-            $this->field($keys);
+            $this->fields($keys);
         }
 
         return $this;
@@ -295,7 +288,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function set( $keys )
     {
-        $this->field($keys);
+        $this->fields($keys);
 
         return $this;
     }
@@ -363,7 +356,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function values( $values )
     {
-        $this->field($values);
+        $this->fields($values);
 
         return $this;
     }
@@ -894,7 +887,7 @@ class QueryBuilder implements QueryBuilderInterface
      * @throws \UnexpectedValueException
      * @return array|bool|int|string
      */
-    public function execute( array $data = [] ) //@TODO: change name to 'get'
+    public function execute( array $data = [] )
     {
         if( !$statement = $this->statement($data) )
         {
@@ -929,7 +922,7 @@ class QueryBuilder implements QueryBuilderInterface
      * Execute the query and get the first set of results
      * 
      * @param  array  $data
-     * @return Object|mixed|false
+     * @return stdClass|array|false
      */
     public function single( array $data = [] )
     {
@@ -946,6 +939,20 @@ class QueryBuilder implements QueryBuilderInterface
         }
 
         return false;
+    }
+
+    /**
+     * Select query find by key and value ; must had set table first
+     * 
+     * @param  string $key
+     * @param  mixed $value
+     * @return stdClass|array|false
+     */
+    public function findBy( $key, $value )
+    {
+        $this->where($key)->limit(1);
+
+        return $this->single([$key => $value]);
     }
 
     /**
