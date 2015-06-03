@@ -99,5 +99,7 @@ interface QueryBuilderInterface
 
     public function single( array $data );
 
+    public function findBy( $key, $value );
+
 
 }
