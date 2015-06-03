@@ -20,7 +20,7 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
      * the table associated with the model.
      * @var string
      */
-    protected $table;
+    protected static $table;
 
     /**
      * primary key for the model
@@ -66,11 +66,11 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
      *
      * @return string
      */
-    public function getTable()
+    public static function getTable()
     {
-        if( isset($this->table) )
+        if( isset(static::$table) )
         {
-            return $this->table;
+            return static::$table;
         }
 
         // '@' will be replace by table preffix by Connection
@@ -83,9 +83,9 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
      *
      * @param  string  $table
      */
-    public function table( $table )
+    public static function table( $table )
     {
-        $this->table = $table;
+        static::$table = $table;
     }
 
     /**
@@ -93,11 +93,11 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
      * 
      * @return QueryBuilder
      */
-    public function query()
+    public static function query()
     {
         $builder = static::newQuery();
 
-        $builder->table($this->getTable());
+        $builder->table(static::getTable());
 
         return $builder;
     }
@@ -145,10 +145,10 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
      */
     public function delete()
     {
-        $result = $this->query()
-                       ->delete()
-                       ->where($this->keypair())
-                       ->execute();
+        $result = static::query()
+                         ->delete()
+                         ->where($this->keypair())
+                         ->execute();
 
         if( $result > 0 )
         {
@@ -188,11 +188,11 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
         {
             if( !empty($this->diff()) )
             {
-                $saved = $this->query()
-                              ->update()
-                              ->set($this->diffKeys())
-                              ->where($this->keypair())
-                              ->execute($this->diff());
+                $saved = static::query()
+                                ->update()
+                                ->set($this->diffKeys())
+                                ->where($this->keypair())
+                                ->execute($this->diff());
             }
             else
             {
@@ -209,10 +209,10 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
 
         else
         {
-            $saved = $this->query()
-                          ->insert()
-                          ->values($this->getAttributesKeys())
-                          ->execute($this->getAttributes());
+            $saved = static::query()
+                            ->insert()
+                            ->values($this->getAttributesKeys())
+                            ->execute($this->getAttributes());
 
             // finish insert
 
@@ -448,9 +448,9 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
 
         $keyname = $model->getKeyName();
 
-        $results = $model->query()
-                         ->where($keyname)
-                         ->single([$keyname => $value]);
+        $results = $model::query()
+                          ->where($keyname)
+                          ->single([$keyname => $value]);
 
         if( $results )
         {
