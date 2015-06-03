@@ -19,7 +19,7 @@ interface ModelInterface
 
     public function query();
 
-    public static function newQueryBuilder();
+    public static function newQuery();
 
     // syncing
 

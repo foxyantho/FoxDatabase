@@ -95,7 +95,7 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
      */
     public function query()
     {
-        $builder = static::newQueryBuilder();
+        $builder = static::newQuery();
 
         $builder->table($this->getTable());
 
@@ -107,7 +107,7 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
      * 
      * @return QueryBuilder
      */
-    public static function newQueryBuilder()
+    public static function newQuery()
     {
         return new QueryBuilder;
     }
@@ -528,26 +528,6 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
     {
         return $this->toJson();
     }
-
-
-    /**
-     * Handle dynamic static QueryBuilder calls into the method.
-     *
-     * @param  string  $method
-     * @param  array   $arguments
-     * @return mixed|BadMethodCallException
-     */
-    /*public static function __callStatic( $method, $parameters )
-    {
-        $builder = static::newQueryBuilder();
-
-        if( method_exists($builder, $method) )
-        {
-            return call_user_func_array([$builder, $method], $parameters);
-        }
-
-        throw new BadMethodCallException('Call to undefined method "' . get_class($builder) . '"::' . $method . '()');
-    }*/
 
 
 }
