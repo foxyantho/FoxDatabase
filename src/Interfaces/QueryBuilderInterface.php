@@ -23,7 +23,7 @@ interface QueryBuilderInterface
 
     public function getFields();
 
-    public function field( $fields );
+    public function fields( $fields );
 
     public function removeField( $fields );
 

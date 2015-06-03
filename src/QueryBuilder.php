@@ -26,7 +26,7 @@ class QueryBuilder implements QueryBuilderInterface
     const INSERT = 4;
 
 
-    protected $type = static::SELECT;
+    protected $type = self::SELECT;
 
     protected $fields = []; //attributes : SELECT xx, SET xx, VALUES xx
 
@@ -145,7 +145,7 @@ class QueryBuilder implements QueryBuilderInterface
      * @param  string|array $fields
      * @return this
      */
-    public function field( $fields )
+    public function fields( $fields )
     {
         if( is_string($fields) )
         {
@@ -197,7 +197,7 @@ class QueryBuilder implements QueryBuilderInterface
 
         if( isset($keys) )
         {
-            $this->field($keys);
+            $this->fields($keys);
         }
 
         return $this;
@@ -288,7 +288,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function set( $keys )
     {
-        $this->field($keys);
+        $this->fields($keys);
 
         return $this;
     }
@@ -356,7 +356,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function values( $values )
     {
-        $this->field($values);
+        $this->fields($values);
 
         return $this;
     }
@@ -939,6 +939,20 @@ class QueryBuilder implements QueryBuilderInterface
         }
 
         return false;
+    }
+
+    /**
+     * Select query find by key and value ; must had set table first
+     * 
+     * @param  string $key
+     * @param  mixed $value
+     * @return stdClass|array|false
+     */
+    public function findBy( $key, $value )
+    {
+        $this->where($key)->limit(1);
+
+        return $this->single([$key => $value]);
     }
 
     /**
