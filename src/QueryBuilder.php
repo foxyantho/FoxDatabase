@@ -26,7 +26,7 @@ class QueryBuilder implements QueryBuilderInterface
     const INSERT = 4;
 
 
-    protected $type = self::SELECT;
+    protected $type;
 
     protected $fields = []; //attributes : SELECT xx, SET xx, VALUES xx
 
@@ -53,12 +53,13 @@ class QueryBuilder implements QueryBuilderInterface
 
     /**
      * Get query string type
+     * Default query type : SELECT
      * 
      * @return int
      */
     public function getQueryType()
     {
-        return $this->type;
+        return $this->type ?: static::SELECT;
     }
 
     /**
