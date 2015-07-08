@@ -44,7 +44,7 @@ class DatabaseManager implements ConnectionResolverInterface
             // 'port'     => int
             // 'strict'   => bool
             // 'options'  => []
-            'querylog' => true
+            'querylog' => false
         ];
     }
 
