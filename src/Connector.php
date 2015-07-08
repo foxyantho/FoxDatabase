@@ -23,7 +23,7 @@ class Connector implements ConnectorInterface
             PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
             PDO::ATTR_STRINGIFY_FETCHES => false,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING, //PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_EMULATE_PREPARES => false
 
         //PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
@@ -76,14 +76,9 @@ class Connector implements ConnectorInterface
      */
     protected function createConnection( $dsn, $username, $password, array $options )
     {
-        try
-        {
-            return new PDO($dsn, $username, $password, $options);
-        }
-        catch( PDOException $e )
-        {
-            die('Connector: Could not connect to database, code : ' . $e->getCode());
-        }
+        return new PDO($dsn, $username, $password, $options);
+
+        //catch( PDOException $e ) die('Connector: Could not connect to database, code : ' . $e->getCode());
     }
 
     /**
