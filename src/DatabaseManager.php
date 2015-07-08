@@ -110,7 +110,14 @@ class DatabaseManager implements ConnectionResolverInterface
     {
         $name = $name ?: static::getDefaultConnectionName();
 
-        $this->makeAndStoreConnection($name);
+        // if we haven't created this connection, we'll create it based on the config
+
+        if( !isset($this->connections[$name]) )
+        {
+            $connection = $this->makeConnection($name);
+
+            $this->connections[$name] = $connection;
+        }
 
         return $this->connections[$name];
     }
