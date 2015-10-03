@@ -532,24 +532,21 @@ class QueryBuilder implements QueryBuilderInterface
      */
     protected function getFieldsPartQueryString( array $data , Callable $closure, $glue = ', ' )
     {
-        if( $data )
+        $arr = [];
+
+        foreach( $data as $key => $value )
         {
-            $arr = [];
-
-            foreach( $data as $key => $value )
+            if( !is_string($key) ) // non associative array : ['key', 'key']
             {
-                if( !is_string($key) ) // non associative array : ['key', 'key']
-                {
-                    $key = $value; //@FIXME: unknow when using number etc
+                $key = $value; //@FIXME: unknow when using number etc
 
-                    $value = null; // must be null -> futher isset() ; if($value) with empty string
-                }
-
-                $arr[] = $closure($key, $value);
+                $value = null; // must be null -> futher isset() ; if($value) with empty string
             }
 
-            return $this->arrayAsString($arr, $glue);
+            $arr[] = $closure($key, $value);
         }
+
+        return $this->arrayAsString($arr, $glue);
     }
 
 
@@ -692,7 +689,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     protected function getGroupByQueryString()
     {
-        if( $this->groupBy )
+        if( !empty($this->groupBy) )
         {
             return 'GROUP BY ' . $this->arrayAsString($this->groupBy);
         }
@@ -705,7 +702,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     protected function getHavingQueryString()
     {
-        if( $this->having )
+        if( !empty($this->having) )
         {
             return 'HAVING ' . $this->arrayAsString($this->having, ' AND ');
         }
@@ -718,7 +715,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     protected function getOrderByQueryString()
     {
-        if( $this->orderBy )
+        if( !empty($this->orderBy) )
         {
             return 'ORDER BY ' . $this->arrayAsString($this->orderBy) . ' ' . ( $this->orderBySuffix ?: null );
         }
@@ -732,12 +729,12 @@ class QueryBuilder implements QueryBuilderInterface
      */
     protected function getLimitQueryString()
     {
-        if( $this->offset && $this->limit )
+        if( isset($this->offset, $this->limit) )
         {
             return 'LIMIT ' . $this->offset . ', ' . $this->limit;
         }
 
-        if( $this->limit )
+        if( isset($this->limit) )
         {
             return 'LIMIT ' . $this->limit;
         }
@@ -760,27 +757,27 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $queryString = 'SELECT ' . $this->getFieldsSelectQueryString() . ' FROM ' . $this->getTablesQueryString();
 
-        if( $this->where )
+        if( !empty($this->where) )
         {
             $queryString .= ' ' . $this->getWhereQueryString();
         }
 
-        if( $this->groupBy )
+        if( !empty($this->groupBy) )
         {
             $queryString .= ' ' . $this->getGroupByQueryString();
         }
 
-        if( $this->having )
+        if( !empty($this->having) )
         {
             $queryString .= ' ' . $this->getHavingQueryString();
         }
 
-        if( $this->orderBy )
+        if( !empty($this->orderBy) )
         {
             $queryString .= ' ' . $this->getOrderByQueryString();
         }
 
-        if( $this->limit )
+        if( !empty($this->limit) )
         {
             $queryString .= ' ' . $this->getLimitQueryString();
         }
@@ -797,7 +794,7 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $queryString = 'UPDATE ' . $this->getTablesQueryString() . ' SET ' . $this->getFieldsUpdateQueryString();
 
-        if( $this->where )
+        if( !empty($this->where) )
         {
             $queryString .= ' ' . $this->getWhereQueryString();
         }
@@ -814,7 +811,7 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $queryString = 'DELETE FROM ' . $this->getTablesQueryString();
 
-        if( $this->where )
+        if( !empty($this->where) )
         {
             $queryString .= ' ' . $this->getWhereQueryString();
         }
