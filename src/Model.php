@@ -71,7 +71,9 @@ abstract class Model implements ModelInterface, ConnectionRetrieveInterface
 
         // '@' will be replace by table preffix by Connection
 
-        return '@' . strtolower(end(explode('\\', get_called_class())));
+        $parts = explode('\\', get_called_class());
+
+        return '@' . strtolower(end( $parts  ));
     }
 
     /**
