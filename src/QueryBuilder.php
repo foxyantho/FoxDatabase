@@ -738,8 +738,6 @@ class QueryBuilder implements QueryBuilderInterface
         {
             return 'LIMIT ' . $this->limit;
         }
-
-        //return 'LIMIT ' . ( isset($this->offset) ? $this->offset . ', ' . $this->limit : $this->limit );
     }
 
 
