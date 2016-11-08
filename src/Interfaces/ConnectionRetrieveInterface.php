@@ -12,7 +12,7 @@ interface ConnectionRetrieveInterface
      * Start the model with a given connection
      *
      * @param  string  $connection
-     * @return
+     * @return static
      */
     public static function on( $connection );
 
